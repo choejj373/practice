@@ -12,11 +12,18 @@ registerBtn.addEventListener("click", register );
 
 function register() {
 
+    if( !id.value ) return alert("아이디를 입력해주세요");
+    if( psword.value !== pswordConfirm.value ){
+        return alert("패스워드가 다릅니다");
+    }
+   
+    // pswordConfirm: pswordConfirm.value,
+
     const req = {
         id: id.value,
         name: name.value,
         psword: psword.value,
-        pswordConfirm: pswordConfirm.value,
+        
     };
 
    console.log( req.id + req.name + req.psword );
