@@ -22,6 +22,14 @@ function login() {
         },
         body: JSON.stringify(req)
     })
-    .then( (res) => res.json())
-    .then( (res) => console.log( res) );
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        //console.log( res);
+        if( res.success ){
+            location.href = "/";
+        } else {
+          alert( res.msg ); //=> cathc 발생
+          //  location.href = "/login"
+        }
+    })
 };
