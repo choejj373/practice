@@ -1,21 +1,27 @@
 "use strict"
 
 const id = document.querySelector("#id");
+const name = document.querySelector("#name");
 const psword = document.querySelector("#psword");
-const loginBtn = document.querySelector("#button");
+const pswordConfirm = document.querySelector("#psword-confirm");
+const registerBtn = document.querySelector("#button");
 
-loginBtn.addEventListener("click", login );
+// console.log("hello register");
 
-function login() {
+registerBtn.addEventListener("click", register );
+
+function register() {
 
     const req = {
         id: id.value,
+        name: name.value,
         psword: psword.value,
+        pswordConfirm: pswordConfirm.value,
     };
 
-   
+   console.log( req.id + req.name + req.psword );
 
-    fetch("/login", {
+    fetch("/register", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -26,7 +32,7 @@ function login() {
     .then( (res) => {
         //console.log( res);
         if( res.success ){
-            location.href = "/";
+            location.href = "/login";
         } else {
           alert( res.msg ); //=> cathc 발생
           //  location.href = "/login"
