@@ -6,6 +6,13 @@ class User{
     constructor(body){
         this.body = body;
     };
+    
+    register(){
+        const client = this.body;
+        UserStorage.save( client );
+
+        return { success : true };
+    };
 
     login(){
         // console.log("start User.login");
@@ -15,7 +22,7 @@ class User{
 
         const { id, psword } = UserStorage.getUserInfo( body.id );
 
-        // console.log("End call UserStorage.getUserInfo");
+        console.log("End call UserStorage.getUserInfo");
 
         // if( userInfo.id ){
         if( id ){
