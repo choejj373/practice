@@ -4,7 +4,7 @@
   "description": "첫번째 테스트 프로젝트",
   "main": "app.js",
   "bin": {
-    "practice": "bin/www.js"
+    "practice": "www.js"
   },
   "scripts": {
     "start": "node ./bin/www.js",
