@@ -1,6 +1,7 @@
 "use strict";
 
-const UserStorage = require("../../models/userstorage");
+//const UserStorage = require("../../models/userstorage");
+const User = require("../../models/user");
 
 const output = {
     home : (req, res) => {
@@ -12,25 +13,29 @@ const output = {
 }
 const process = {
     login: (req, res) => {
-        const id = req.body.id,
-        psword = req.body.psword;
+        const user = new User( req.body );
+        const response = user.login();
+        return res.json(response);
+        
+        // const id = req.body.id,
+        // psword = req.body.psword;
 
-        const users = UserStorage.getusers( "id", "psword" );
-        //console.log( users );
+        // const users = UserStorage.getusers( "id", "psword" );
+        // //console.log( users );
 
-        if( users.id.includes( id )){
-             const idx = users.id.indexOf(id);
-             if( users.psword[ idx ] === psword ){
-                 return res.json({
-                     success:true,
-                 });
-             };
-         };
+        // if( users.id.includes( id )){
+        //      const idx = users.id.indexOf(id);
+        //      if( users.psword[ idx ] === psword ){
+        //          return res.json({
+        //              success:true,
+        //          });
+        //      };
+        //  };
 
-         return res.json({
-             success: false,
-             msg: "login failed"
-         });
+        //  return res.json({
+        //      success: false,
+        //      msg: "login failed"
+        //  });
     },
 }
 
