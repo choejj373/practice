@@ -16,12 +16,12 @@ class User{
 
     async login(){
         const body = this.body;
-        // await UserStorage.getUserInfo( body.id );
-        const { id, psword } = await UserStorage.getUserInfo( body.id );
 
-        // console.log( "user.log():" + id + psword );
-        if( id ){
-            if( id === this.body.id && psword === this.body.psword){
+        const userInfo = await UserStorage.getUserInfo( body.id );
+
+
+        if( userInfo ){
+            if( userInfo.id === this.body.id && userInfo.psword === this.body.psword){
                 return { success : true };
             }
             return { success : false , msg : " 비밀번호가 틀렸습니다."}

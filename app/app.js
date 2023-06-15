@@ -2,11 +2,14 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const dotenv = require ("dotenv");
 
+dotenv.config();
+
+console.log( process.env.PORT);
 const app = express();
 
 const home = require("./src/routes/home");
-
 
 app.set("views", "./src/views" );
 app.set("view engine", "ejs");
