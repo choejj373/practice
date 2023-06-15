@@ -9,22 +9,17 @@ class User{
     
     register(){
         const client = this.body;
-        UserStorage.save( client );
+        return UserStorage.save( client );
 
-        return { success : true };
+
     };
 
-    login(){
-        // console.log("start User.login");
+    async login(){
         const body = this.body;
-        
-        // console.log("Start call UserStorage.getUserInfo : " + body.id );
+        // await UserStorage.getUserInfo( body.id );
+        const { id, psword } = await UserStorage.getUserInfo( body.id );
 
-        const { id, psword } = UserStorage.getUserInfo( body.id );
-
-        console.log("End call UserStorage.getUserInfo");
-
-        // if( userInfo.id ){
+        // console.log( "user.log():" + id + psword );
         if( id ){
             if( id === this.body.id && psword === this.body.psword){
                 return { success : true };
