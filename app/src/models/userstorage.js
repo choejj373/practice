@@ -5,7 +5,7 @@ const db = require("../config/db");
 
 class UserStorage{
 
-     // not found 처리 필요
+
     static getUserInfo(id){
 
         return new Promise(( resolve, reject ) =>{

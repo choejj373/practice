@@ -5,7 +5,12 @@ const User = require("../../models/user");
 
 const output = {
     home : (req, res) => {
-        res.render("home/index");
+        console.log( req.sessionID, req.session );
+        if( req.session.isLogined ){
+            res.render("home/index");
+        }else{
+            res.render("home/login");        
+        }
     },
     login : (req, res) => {
         res.render("home/login");
@@ -18,8 +23,14 @@ const process = {
     login: async(req, res) => {
         const user = new User( req.body );
         const response = await user.login();
+        if( response.success )
+        {
+            req.session.isLogined = true;
+            req.session.save( function(){
+                return res.json(response);  
+            });
+        }
         return res.json(response)},
-
     register: async( req, res) => {
         const user = new User( req.body );
         const response = await user.register();

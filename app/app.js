@@ -6,9 +6,36 @@ const dotenv = require ("dotenv");
 
 dotenv.config();
 
-console.log( process.env.PORT);
 const app = express();
 
+const session = require("express-session");
+const MySqlStore = require("express-mysql-session")(session);
+const options = {
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "1214",
+    database: "practice",
+
+    // clearExpired: true,
+    // checkExpirationInterval: 900000,
+    // expiration: 86400000,
+};
+
+const sessionStore = new MySqlStore( options );
+
+app.use(
+    session({
+        key: "session_cookie_name",
+        secret: "session_cookie_secret",
+        store: sessionStore,
+        resave: false,
+        saveUninitialized: true,
+        // cookie:{
+        //     maxAge: 300,
+        // }
+    })
+);
 const home = require("./src/routes/home");
 
 app.set("views", "./src/views" );
@@ -21,4 +48,4 @@ app.use(bodyParser.urlencoded( { extended:true } ));
 app.use('/', home);
 
 module.exports = app;
-
+ 
