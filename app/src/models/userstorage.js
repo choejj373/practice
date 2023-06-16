@@ -17,11 +17,11 @@ class UserStorage{
         });
     }
 
-    static save( userInfo ){
+    static save( userInfo ,hashedpassword, salt ){
 
         return new Promise(( resolve, reject ) =>{
-            db.query("INSERT INTO account(id, name, psword) VALUES(?, ?, ?);", 
-                [userInfo.id,userInfo.name,userInfo.psword], (err )=>{
+            db.query("INSERT INTO account(id, name, psword, salt) VALUES(?, ?, ?, ?);", 
+                [userInfo.id,userInfo.name,hashedpassword, salt], (err )=>{
                     if(err) reject(`${err}`);
                     resolve( {success:true} );
             });
