@@ -18,8 +18,8 @@ const options = {
     database: "practice",
 
     // clearExpired: true,
-    // checkExpirationInterval: 900000,
-    // expiration: 86400000,
+    // checkExpirationInterval: 300,
+    // expiration: 1000 * 60 * 60 * 24,
 };
 
 const sessionStore = new MySqlStore( options );
@@ -30,9 +30,10 @@ app.use(
         secret: "session_cookie_secret",
         store: sessionStore,
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         // cookie:{
-        //     maxAge: 300,
+        //     expires : Date.now(),
+        //     maxAge: 1000 * 60 * 60,
         // }
     })
 );
