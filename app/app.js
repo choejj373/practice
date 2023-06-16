@@ -10,6 +10,8 @@ const app = express();
 
 const session = require("express-session");
 const MySqlStore = require("express-mysql-session")(session);
+const minute = 1000 * 60;
+const hour = minute * 60;
 const options = {
     host: "localhost",
     port: 3306,
@@ -17,9 +19,9 @@ const options = {
     password: "1214",
     database: "practice",
 
-    // clearExpired: true,
-    // checkExpirationInterval: 300,
-    // expiration: 1000 * 60 * 60 * 24,
+    clearExpired: true,
+    checkExpirationInterval: minute,
+    expiration: hour,
 };
 
 const sessionStore = new MySqlStore( options );
@@ -31,12 +33,13 @@ app.use(
         store: sessionStore,
         resave: false,
         saveUninitialized: false,
-        // cookie:{
-        //     expires : Date.now(),
-        //     maxAge: 1000 * 60 * 60,
-        // }
+        cookie:{
+            maxAge: minute * 5,
+        }
     })
 );
+
+
 const home = require("./src/routes/home");
 
 app.set("views", "./src/views" );
