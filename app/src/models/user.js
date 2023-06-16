@@ -45,12 +45,9 @@ class User{
         const body = this.body;
 
         const userInfo = await UserStorage.getUserInfo( body.id );
-
-        const hashedPwd = await makePasswordHashed( userInfo.salt, body.psword );
-
-        console.log("hashedPwd:"+hashedPwd);
         if( userInfo ){
-            // if( userInfo.id === this.body.id && userInfo.psword === this.body.psword){
+
+            const hashedPwd = await makePasswordHashed( userInfo.salt, body.psword );
             if( userInfo.id === this.body.id && userInfo.psword === hashedPwd){
 
                 return { success : true };
@@ -59,6 +56,6 @@ class User{
         }
         return { success : false, msg : "존재하지 않는 아이디 입니다"}
     }   
-};
+}; 
 
 module.exports = User;

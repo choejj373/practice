@@ -7,17 +7,20 @@
 ### Session
 #### mysql에 저장
 #### 로그인중 체크 기능( 메인 페이지나 채팅 페이지 접속시 인증 안되있다면 로그인 페이지로)
+### MySql
+#### call sp
+#### connection pool
 
 ## 작업중
 
 ## TODO
 ### Session
-#### 자동 만료 기능
-### MySql
-#### transaction
-#### call sp
+#### 자동 만료 기능 - sessions table에 저장된 expires 가 현재 시간에서 -9시간정도 차이가 있다;
 ### 채팅
 #### 채팅방
-### 싱글 게임 구현(?)
+### 싱글 게임 
+### 멀티 게임 
 ### 구글 계정으로 가입 및 로그인
 ### 빌링
+### MySql
+#### transaction ( sp 내에서 )
