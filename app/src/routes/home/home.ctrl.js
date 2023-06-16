@@ -4,14 +4,21 @@
 const User = require("../../models/user");
 
 const output = {
+    chat : (req,res)=>{
+        if( req.session.isLogined ){
+            console.log( "output.chat logined" );
+            res.render("home/chat");
+        }else{
+            console.log( "output.chat not logined" );
+            res.redirect("/login");
+        }
+    },
     home : (req, res) => {
-        console.log( req.session.isLogined );
         if( req.session.isLogined ){
             console.log( "output.home logined" );
             res.render("home/index");
         }else{
             console.log( "output.home not logined" );
-            // res.render("home/login");        
             res.redirect("/login");
         }
     },
