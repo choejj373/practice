@@ -6,7 +6,7 @@ const psword = document.querySelector("#psword");
 const pswordConfirm = document.querySelector("#psword-confirm");
 const registerBtn = document.querySelector("#button");
 
-// console.log("hello register");
+
 
 registerBtn.addEventListener("click", register );
 
