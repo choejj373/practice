@@ -9,6 +9,13 @@ const output = {
         UserStorage.test();
         res.render("home/test");
     },
+    inventory : ( req,res )=> {
+        if( req.session.isLogined ){
+            res.render("home/inventory");
+        }else{
+            res.redirect("/login");        
+        }
+    },
     chat : (req,res)=>{
         res.render("home/chat");
     },
@@ -19,7 +26,6 @@ const output = {
             res.render("home/index");
         }else{
             console.log( "output.home not logined" );
-            // res.render("home/login");        
             res.redirect("/login");
         }
     },
@@ -37,7 +43,18 @@ const output = {
         res.render("home/register");
     }
 }
+
 const process = {
+
+    inventory: async(req,res)=>{
+        console.log( 'process.inventory : ', req.session.user_id );
+        const response = await UserStorage.getItems( req.session.user_id );
+        if( response.success )
+        {
+            console.log( JSON.stringify(response.items ) );
+        }
+        return res.json(response);
+    },
     login: async(req, res) => {
         console.log( "process.login" );
         const user = new User( req.body );
@@ -45,6 +62,8 @@ const process = {
         if( response.success )
         {
             req.session.isLogined = true;
+            req.session.user_id = req.body.id;
+
             req.session.save( () => {
                 // return res.json(response);  
             });

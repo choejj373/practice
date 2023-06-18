@@ -44,6 +44,20 @@ class UserStorage{
             });
         });
     };
+
+    static getItems( user_id ){
+        return new Promise(( resolve, reject )=>{
+            getConnection( (conn) =>{
+                conn.query("SELECT * FROM item_table WHERE owner = ?;", [user_id],
+                (err,data)=>{
+                    if( err ) reject(`${err}`);
+                    // console.log( data );
+                    resolve( {success:true, items:data} );
+                });
+                conn.release();
+            });
+        });
+    };
      
 }
 

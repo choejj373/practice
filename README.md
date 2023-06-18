@@ -25,6 +25,15 @@
 ## 작업중
 ### 싱글 게임 
 #### 상점, 인벤토리
+##### Item Table 생성( item_uid(pk), item_index, owner(fk) )
+##### Session에 user_id 추가
+##### 인벤토리 화면에서 전체 Item List 보여주기
+
+##### 상점에서 아이템 구입시 Item Table에 추가
+
+### 관리 기능
+#### user 삭제
+##### account 와 item 동시 삭제 
 
 ## TODO
 ### LogSystem
