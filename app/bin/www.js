@@ -22,7 +22,8 @@ io.on("connection", function( socket ){
         io.emit( "msg", `${socket.id}: ${data}`);
     });
 
-    socket.on("disconnect", function(data){
+    socket.on("disconnect", function(reason){
+        console.log( socket.id, " : Disconnected")
         io.emit("msg",  `${socket.id} has left the chatroom.` );
     });
 });   

@@ -58,6 +58,19 @@ class UserStorage{
             });
         });
     };
+
+    static buyItem( user_id ){
+        return new Promise(( resolve, reject)=>{
+            getConnection((conn)=>{
+                conn.query("INSERT INTO item_table (owner) values (?);", [user_id],
+                (err,data)=>{
+                    if( err ) reject(`${err}`);
+                    resolve( {success:true});
+                });
+                conn.release();
+            });
+        });
+    };
      
 }
 

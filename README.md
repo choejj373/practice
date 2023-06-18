@@ -22,25 +22,28 @@
 ##### node.js로 구현
 ##### 기본 구현 가능성만 테스트
 
-## 작업중
 ### 싱글 게임 
 #### 상점, 인벤토리
 ##### Item Table 생성( item_uid(pk), item_index, owner(fk) )
 ##### Session에 user_id 추가
 ##### 인벤토리 화면에서 전체 Item List 보여주기
-
 ##### 상점에서 아이템 구입시 Item Table에 추가
 
+## 작업중
+
+
+## TODO
 ### 관리 기능
 #### user 삭제
 ##### account 와 item 동시 삭제 
 
-## TODO
 ### LogSystem
 #### Winston
 
 ### 채팅
 #### 채팅방
+
+### 싱글 게임
 
 ### 멀티 게임 
 #### 세부적인 매치 메이킹과 멀티 서버 구현 필요

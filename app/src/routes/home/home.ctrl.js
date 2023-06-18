@@ -9,6 +9,13 @@ const output = {
         UserStorage.test();
         res.render("home/test");
     },
+    store : ( req,res )=> {
+        if( req.session.isLogined ){
+            res.render("home/store");
+        }else{
+            res.redirect("/login");        
+        }
+    },
     inventory : ( req,res )=> {
         if( req.session.isLogined ){
             res.render("home/inventory");
@@ -45,7 +52,15 @@ const output = {
 }
 
 const process = {
-
+    store: async(req,res)=>{
+        console.log( 'process.store : ', req.session.user_id );
+        const response = await UserStorage.buyItem( req.session.user_id );
+        if( response.success )
+        {
+            console.log( JSON.stringify(response.items ) );
+        }
+        return res.json(response);
+    },
     inventory: async(req,res)=>{
         console.log( 'process.inventory : ', req.session.user_id );
         const response = await UserStorage.getItems( req.session.user_id );

@@ -1,8 +1,8 @@
 "use strict"
 
 var socket = io.connect("http://localhost:3000",{
-         path: "/socket.io"
-     });
+    path: "/socket.io"
+});
 
 const sendBtn = document.querySelector("#send");
 const msgLine = document.querySelector("#myChat");	

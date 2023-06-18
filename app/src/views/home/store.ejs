@@ -5,41 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
         window.onload = function(){
-            console.log("window onload");
-            fetch("/inventory", {
+            const buyBtn = document.querySelector("#buy");
+            buyBtn.addEventListener("click", buy );
+        }
+
+        function buy(){
+            const req = {
+                action: "buy",
+                index: 1
+            };
+            
+            fetch("/store", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify( {} )
+                body: JSON.stringify( {req} )
             })
             .then((res) => res.json()) // json() promise
             .then((res) => {
                 console.log( res );
                 if( res.success ){
-                    const messagesList = document.querySelector('#inventory');
-
-                    res.items.forEach(element => {
-                        let messageItem = document.createElement('li');
-                        messageItem.textContent = `UID: ${element.item_uid}, INDEX: ${element.item_index}, OWNER: ${element.owner}`;
-                        messagesList.appendChild(messageItem);		
-                    });
                 } else {
                     alert( res.msg );
                 }
             })
-        };
-
+        }
     </script>
     <title>Document</title>
 </head>
 
 <body>
-<h1> Inventory </h1>
+<h1> Store </h1>
 
-<ul id = "inventory">
-</ul>
-<br>
+<input id="buy" type="button"  value="아이템 구입"><Br>
 
 <a href="/logout">logout</a>
 </body>
