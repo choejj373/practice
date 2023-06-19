@@ -1,16 +1,9 @@
-// "use strict";
+"use strict";
 
 const express = require("express");
-// const bodyParser = require("body-parser");
 const dotenv = require ("dotenv");
 const session = require("express-session");
 const cookieParser = require('cookie-parser');
-
-
-//const redisStore = require("connect-redis").default;
-const memcachedStore = require("connect-memcached")(session);
-
-//const redis = require("redis");
 
 dotenv.config();
 
@@ -20,53 +13,41 @@ const minute = 1000 * 60;
 const hour = minute * 60;
 
 
-// let redisClient = redis.createClient({
-//     url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
-//     legacyMode : true
-// });
+/**---------------------------------------------------------------*/
+// MemoryStore For Dev
+app.use(
+    session({
+        secret:process.env.COOKIE_SECRET,
+        resave:false,
+        saveUninitialized: false, 
+    })
+);
+/**---------------------------------------------------------------*/
+// const memcachedStore = require("connect-memcached")(session);
+// app.use(cookieParser(process.env.COOKIE_SECRET));
+//
+// const sessionOption = {
+//     resave: false,
+//     saveUninitialized: false,
+//     secret: process.env.COOKIE_SECRET,
+//     proxy: "true",
+//     store: new memcachedStore({ 
+//         hosts: "127.0.0.1",
+//         port: 11211,
+//         secret: "123, easy as ABC",
+//         // maxExpiration:60,
+//         // clearExpired: true,
+//         // checkExpirationInterval: minute,
+//         // expiration: hour,
+//         unset: 'destroy'
+//     }),
+//     rolling:true,
+//     cookie:{
+//          maxAge: minute,
+//     },
+// }; 
+// app.use( session(sessionOption));
 
-// redisClient.on( 'connect', ()=>{
-//     console.info( 'Redis Connected!');
-
-//     redisClient.on('error', (err)=>{
-//         console.error('Redis Client Error', err);
-//     })
-// })
-
-// redisClient.connect().then();
-// const redisCli = redisClient.v4;
-
-app.use(cookieParser(process.env.COOKIE_SECRET));
-
-const sessionOption = {
-    resave: false,
-    saveUninitialized: false,
-    secret: process.env.COOKIE_SECRET,
-    proxy: "true",
-    store: new memcachedStore({ 
-        hosts: "127.0.0.1",
-        port: 11211,
-        secret: "123, easy as ABC",
-        // maxExpiration:60,
-        // clearExpired: true,
-        // checkExpirationInterval: minute,
-        // expiration: hour,
-        unset: 'destroy'
-    }),
-    rolling:true,
-    cookie:{
-         maxAge: minute,
-    },
-
- 
-}; 
-
-app.use( session(sessionOption));
-
-//redisClient.set('key', '123');
-// redisClient.get('key',(err,value)=>{
-//     console.log(value);
-// });
 /**---------------------------------------------------------------*/
 // const MySqlStore = require("express-mysql-session")(session);
 // const options = {
@@ -104,9 +85,6 @@ app.set("views", "./src/views" );
 app.set("view engine", "ejs");
 
 app.use(express.static(`${__dirname}/src/public`));
-
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded( { extended:true } ));
 
 app.use(express.json());
 app.use(express.urlencoded( { extended:true } ));

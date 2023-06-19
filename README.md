@@ -25,7 +25,7 @@
 
 ### 싱글 게임 
 #### 상점, 인벤토리
-##### Item Table 생성( item_uid(pk), item_index, owner(fk) )
+##### Item Table 생성( item_uid(pk), item_index, owner )
 ##### Session에 user_id 추가
 ##### 인벤토리 화면에서 전체 Item List 보여주기
 ##### 상점에서 아이템 구입시 Item Table에 추가
