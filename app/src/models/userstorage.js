@@ -58,6 +58,18 @@ class UserStorage{
             });
         });
     };
+    static sellItem( user_id, item_uid ){
+        return new Promise(( resolve, reject)=>{
+            getConnection((conn)=>{
+                conn.query("DELETE FROM item_table WHERE item_uid = ?;", [item_uid],
+                (err,data)=>{
+                    if( err ) reject(`${err}`);
+                    resolve( {success:true});
+                });
+                conn.release();
+            });
+        }); 
+    };
 
     static buyItem( user_id ){
         return new Promise(( resolve, reject)=>{

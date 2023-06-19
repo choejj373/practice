@@ -16,6 +16,7 @@ router.get("/store", ctrl.output.store);
 
 router.post("/login", ctrl.process.login );
 router.post("/register", ctrl.process.register );
-router.post("/inventory", ctrl.process.inventory );
+router.post("/inventory/get-all", ctrl.process.inventory_get_all );
+router.post("/inventory/sell-item", ctrl.process.inventory_sell_item );
 router.post("/store", ctrl.process.store);
 module.exports = router;  

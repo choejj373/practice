@@ -10,25 +10,29 @@ const output = {
         res.render("home/test");
     },
     store : ( req,res )=> {
-        if( req.session.isLogined ){
+        if( req.session.key ){
             res.render("home/store");
         }else{
             res.redirect("/login");        
         }
     },
     inventory : ( req,res )=> {
-        if( req.session.isLogined ){
+        if( req.session.key ){
             res.render("home/inventory");
         }else{
             res.redirect("/login");        
         }
     },
     chat : (req,res)=>{
-        res.render("home/chat");
+        if( req.session.key ){
+            res.render("home/chat");
+        }else{
+            res.redirect("/login");        
+        }
     },
     home : (req, res) => {
         console.log( req.session.isLogined );
-        if( req.session.isLogined ){
+        if( req.session.key ){
             console.log( "output.home logined" );
             res.render("home/index");
         }else{
@@ -61,8 +65,17 @@ const process = {
         }
         return res.json(response);
     },
-    inventory: async(req,res)=>{
-        console.log( 'process.inventory : ', req.session.user_id );
+    inventory_sell_item: async(req,res)=>{
+        console.log( 'process.inventory_sell_item : ', req.body.item_uid );
+        const response = await UserStorage.sellItem( req.session.user_id, req.body.item_uid );
+        if( response.success )
+        {
+            //console.log( JSON.stringify(response.items ) );
+        }
+        return res.json(response);
+    },
+    inventory_get_all: async(req,res)=>{
+        console.log( 'process.inventory_get_all : ', req.session.user_id );
         const response = await UserStorage.getItems( req.session.user_id );
         if( response.success )
         {
@@ -70,17 +83,17 @@ const process = {
         }
         return res.json(response);
     },
-    login: async(req, res) => {
+    login: async(req, res) => { 
         console.log( "process.login" );
         const user = new User( req.body );
         const response = await user.login();
         if( response.success )
         {
-            req.session.isLogined = true;
+            req.session.key = req.body.id;
             req.session.user_id = req.body.id;
 
             req.session.save( () => {
-                // return res.json(response);  
+            // return res.json(response);  
             });
         }
         return res.json(response)},

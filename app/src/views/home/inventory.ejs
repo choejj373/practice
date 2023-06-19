@@ -3,34 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-        window.onload = function(){
-            console.log("window onload");
-            fetch("/inventory", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify( {} )
-            })
-            .then((res) => res.json()) // json() promise
-            .then((res) => {
-                console.log( res );
-                if( res.success ){
-                    const messagesList = document.querySelector('#inventory');
-
-                    res.items.forEach(element => {
-                        let messageItem = document.createElement('li');
-                        messageItem.textContent = `UID: ${element.item_uid}, INDEX: ${element.item_index}, OWNER: ${element.owner}`;
-                        messagesList.appendChild(messageItem);		
-                    });
-                } else {
-                    alert( res.msg );
-                }
-            })
-        };
-
-    </script>
+    <script src="/js/home/inventory.js" defer> </script>
     <title>Document</title>
 </head>
 
@@ -40,6 +13,9 @@
 <ul id = "inventory">
 </ul>
 <br>
+
+<input id = "item_uid" type="text" placeholder="UID"><br>
+<input id = "send" type="button"  value="아이템 팔기"><br>
 
 <a href="/logout">logout</a>
 </body>

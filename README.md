@@ -9,9 +9,9 @@
 ### 패스워드 저장시 암호화
 
 ### Session
-#### mysql에 저장
+#### mysql에 저장 => memcached로 변경( redis 테스트 환경이 불가;)
 #### 로그인중 체크 ( 메인 페이지나 채팅 페이지 접속시 인증 안되있다면 로그인 페이지로)
-#### 자동 만료 - sessions table에 표시된 시간은 timezone 적용 안된 시간
+#### 자동 만료 - my sql 에서 sessions table에 표시된 시간은 timezone 적용 안된 시간이었음;
 
 ### MySql
 #### call sp
@@ -29,6 +29,7 @@
 ##### Session에 user_id 추가
 ##### 인벤토리 화면에서 전체 Item List 보여주기
 ##### 상점에서 아이템 구입시 Item Table에 추가
+##### 인벤토리에서 아이템 판매
 
 ## 작업중
 
