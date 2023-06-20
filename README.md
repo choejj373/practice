@@ -3,59 +3,43 @@
 + 구현 완료된 기능
     + 회원 가입 및 로그인 
         + MySql에 저장 
-    + Session
+        + 패스워드 암호화
 
+    + Session
+        + mysql, memchached 저장소 테스트 완료
+        + 자동 만료 테스트 완
+        
     + 채팅 
         + Websocket
         + 로그인된 클라이언트간 채팅
 
-### 패스워드 저장시 암호화
+    + MySql
+        + connection, connection pool 
+        + call query, call sp
 
-### Session
-#### mysql에 저장 => memcached로 변경( redis 테스트 환경이 불가;)
-#### 로그인중 체크 ( 메인 페이지나 채팅 페이지 접속시 인증 안되있다면 로그인 페이지로)
-#### 자동 만료 - my sql 에서 sessions table에 표시된 시간은 timezone 적용 안된 시간이었음;
+    + 싱글 플레이 게임
+        + 인벤토리 - 전체 아이템 보기, 아이템 팔기
+        + 상점 - 아이템 구입
 
-### MySql
-#### call sp
-#### connection pool
-
-### 멀티 게임 
-#### 매치메이크 서버, 멀티 게임 서버 
-##### node.js로 구현
-##### 기본 구현 가능성만 테스트
-##### https://github.com/choejj373/multigame
-
-### 싱글 게임 
-#### 상점, 인벤토리
-##### Item Table 생성( item_uid(pk), item_index, owner )
-##### Session에 user_id 추가
-##### 인벤토리 화면에서 전체 Item List 보여주기
-##### 상점에서 아이템 구입시 Item Table에 추가
-##### 인벤토리에서 아이템 판매
-
-## 작업중
+    * 멀티 플레이를 위한 기본 구현 가능 테스트
+        + node js 로만 구현해봄
+        + https://github.com/choejj373/multigame
 
 
-## TODO
-### 관리 기능
-#### user 삭제
-##### account 와 item 동시 삭제 
++ 작업중
+    + 멀티 플레이 서버로의 접속 보안 강화
 
-### LogSystem
-#### Winston
++ TODO
+    + 관리 기능
+        + user 삭제 - account 와 item 동시 삭제 
 
-### 채팅
-#### 채팅방
+    + LogSystem : Winston
 
-### 싱글 게임
+    + 채팅 : 채팅방
 
-### 멀티 게임 
-#### 세부적인 매치 메이킹과 멀티 서버 구현 필요
+    + 멀티 게임 
+        + 세부적인 매치 메이킹과 멀티 서버 구현 필요 : pve or pvp
 
-### 구글 계정으로 가입 및 로그인
+    + 구글 계정으로 가입 및 로그인
 
-### 빌링
-
-### MySql
-#### transaction ( sp 내에서 )
+    + 빌링
