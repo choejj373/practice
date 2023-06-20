@@ -75,6 +75,10 @@
     + redis
         + linux 혹은 windows 64bit 설치 필요
 
+    + 보안
+        + https
+        + websocket은 별도 암호화 필요한가?
+        
     + 구글 계정으로 가입 및 로그인
 
     + 빌링
