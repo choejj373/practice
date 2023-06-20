@@ -30,11 +30,27 @@ const output = {
             res.redirect("/login");        
         }
     },
-    home : (req, res) => {
+    home : async (req, res) => {
         console.log( req.session.isLogined );
         if( req.session.key ){
             console.log( "output.home logined - ", req.session.user_name );
-            res.render("home/index",{user_name:req.session.user_name});
+
+            const userInfo = await UserStorage.getUserInfo( req.session.user_id );
+
+            if( userInfo ){
+                res.render("home/index",{
+                    user_name: userInfo.name,
+                    user_money : userInfo.money,
+                    battle_coin : userInfo.battle_coin,
+                });
+            }else{
+                res.render("home/index",{
+                    user_name: "",
+                    user_money : 0,
+                    battle_coin : 0,
+                });
+            }
+
         }else{
             console.log( "output.home not logined" );
             res.redirect("/login");
@@ -52,6 +68,10 @@ const output = {
     register : ( req, res) => {
         console.log( "output.register" );
         res.render("home/register");
+    },
+    singlegame : ( req, res)=>{
+        console.log( "singlegame");
+        res.render("home/singlegame");
     }
 }
 
@@ -111,7 +131,17 @@ const process = {
             console.log( err );
         }
         return res.json(response)},
-
+    startsinglegame : async( req, res)=>{
+            console.log( "process.singlegame : ", req.session.user_id );
+            const response = await UserStorage.startSingleGame( req.session.user_id );
+            return res.json(response);
+        },
+    endsinglegame : async(req,res)=>{
+        console.log( 'delete singlegame : ', req.session.user_id );
+        const response = await UserStorage.addUserMoney( req.session.user_id, 100 );
+        return res.json( {success:true} );
+    },
+    
 }
 
 module.exports = {

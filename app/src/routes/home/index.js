@@ -13,10 +13,14 @@ router.get("/chat", ctrl.output.chat);
 router.get("/test", ctrl.output.test);
 router.get("/inventory", ctrl.output.inventory);
 router.get("/store", ctrl.output.store);
+router.get("/singlegame", ctrl.output.singlegame);
 
 router.post("/login", ctrl.process.login );
 router.post("/register", ctrl.process.register );
 router.post("/inventory/get-all", ctrl.process.inventory_get_all );
 router.post("/inventory/sell-item", ctrl.process.inventory_sell_item );
 router.post("/store", ctrl.process.store);
-module.exports = router;  
+router.post("/singlegame", ctrl.process.startsinglegame);
+
+router.delete("/singlegame", ctrl.process.endsinglegame );
+module.exports = router;   

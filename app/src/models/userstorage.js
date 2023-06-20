@@ -24,7 +24,6 @@ class UserStorage{
                     if(err) reject(`${err}`);
                     resolve( data[0] );
                 });
-                console.log("db conn release");
                 conn.release();
             });
         });
@@ -83,7 +82,34 @@ class UserStorage{
             });
         });
     };
-     
+
+    // underflow 체크 필요
+    static startSingleGame( user_id ){
+        return new Promise(( resolve, reject)=>{
+            getConnection((conn)=>{
+                conn.query("UPDATE account SET battle_coin = battle_coin - 1 WHERE id = (?);", [user_id],
+                (err,data)=>{
+                    if( err ) reject(`${err}`);
+                    resolve( {success:true});
+                });
+                conn.release();
+            });
+        });
+    };
+
+    // overflow 체크 필요
+    static addUserMoney( user_id, money ){
+        return new Promise(( resolve, reject)=>{
+            getConnection((conn)=>{
+                conn.query("UPDATE account SET money = money + ? WHERE id = ?;", [money, user_id],
+                (err,data)=>{
+                    if( err ) reject(`${err}`);
+                    resolve( {success:true});
+                });
+                conn.release();
+            });
+        });
+    };
 }
 
 module.exports = UserStorage;

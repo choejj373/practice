@@ -3,7 +3,7 @@
 const express = require("express");
 const dotenv = require ("dotenv");
 const session = require("express-session");
-const cookieParser = require('cookie-parser');
+
 
 dotenv.config();
 
@@ -24,6 +24,7 @@ const hour = minute * 60;
 // );
 /**---------------------------------------------------------------*/
 // const memcachedStore = require("connect-memcached")(session);
+// const cookieParser = require('cookie-parser');
 // app.use(cookieParser(process.env.COOKIE_SECRET));
 //
 // const sessionOption = {
