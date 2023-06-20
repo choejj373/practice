@@ -38,10 +38,12 @@
     + LogSystem : Winston
 
     + 우편 시스템
-        + mail_table
-        + mail_attached_item_table
+        + DB
+            + mail_table
+            + mail_attached_item_table
         + 우편 보기
         + 우편 보내기
+            + 알림
         + 공지( 별도 시스템으로 ?)
     
     + 채팅  
@@ -49,6 +51,9 @@
 
     + 멀티 게임 
         + 세부적인 매치 메이킹과 멀티 서버 구현 필요 : pve or pvp
+
+    + redis
+        + linux 혹은 windows 64bit 설치 필요
 
     + 구글 계정으로 가입 및 로그인
 
