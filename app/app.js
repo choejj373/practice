@@ -15,13 +15,13 @@ const hour = minute * 60;
 
 /**---------------------------------------------------------------*/
 // MemoryStore For Dev
-app.use(
-    session({
-        secret:process.env.COOKIE_SECRET,
-        resave:false,
-        saveUninitialized: false, 
-    })
-);
+// app.use(
+//     session({
+//         secret:process.env.COOKIE_SECRET,
+//         resave:false,
+//         saveUninitialized: false, 
+//     })
+// );
 /**---------------------------------------------------------------*/
 // const memcachedStore = require("connect-memcached")(session);
 // app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -49,34 +49,34 @@ app.use(
 // app.use( session(sessionOption));
 
 /**---------------------------------------------------------------*/
-// const MySqlStore = require("express-mysql-session")(session);
-// const options = {
-//     host: "localhost",
-//     port: 3306,
-//     user: "root",
-//     password: "1214",
-//     database: "practice",
+const MySqlStore = require("express-mysql-session")(session);
+const options = {
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "1214",
+    database: "practice",
 
-//     clearExpired: true,
-//     checkExpirationInterval: minute,
-//     expiration: hour,
-// };
+    clearExpired: true,
+    checkExpirationInterval: minute,
+    expiration: hour,
+};
 
-// const sessionStore = new MySqlStore( options );
+const sessionStore = new MySqlStore( options );
 
-// app.use(
-//     session({
-//         key: "session_cookie_name",
-//         secret: "session_cookie_secret",
-//         store: sessionStore,
-//         resave: false,
-//         saveUninitialized: false,
-//         rolling:true,
-//         cookie:{
-//             maxAge: minute * 5,
-//         }
-//     })
-// );
+app.use(
+    session({
+        key: "session_cookie_name",
+        secret: "session_cookie_secret",
+        store: sessionStore,
+        resave: false,
+        saveUninitialized: false,
+        rolling:true,
+        cookie:{
+            maxAge: minute * 5,
+        }
+    })
+);
 
 
 const home = require("./src/routes/home");
