@@ -33,8 +33,8 @@ const output = {
     home : (req, res) => {
         console.log( req.session.isLogined );
         if( req.session.key ){
-            console.log( "output.home logined" );
-            res.render("home/index");
+            console.log( "output.home logined - ", req.session.user_name );
+            res.render("home/index",{user_name:req.session.user_name});
         }else{
             console.log( "output.home not logined" );
             res.redirect("/login");
@@ -89,8 +89,10 @@ const process = {
         const response = await user.login();
         if( response.success )
         {
+            console.log( response );
             req.session.key = req.body.id;
             req.session.user_id = req.body.id;
+            req.session.user_name = response.name;
 
             req.session.save( () => {
             // return res.json(response);  

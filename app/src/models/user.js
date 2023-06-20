@@ -50,7 +50,7 @@ class User{
             const hashedPwd = await makePasswordHashed( userInfo.salt, body.psword );
             if( userInfo.id === this.body.id && userInfo.psword === hashedPwd){
 
-                return { success : true };
+                return { success : true, name : userInfo.name };
             }
             return { success : false , msg : " 비밀번호가 틀렸습니다."}
         }
