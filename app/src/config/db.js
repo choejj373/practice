@@ -7,9 +7,9 @@ const dbPool = mysql.createPool({
     password:process.env.DB_PSWORD,
     database:process.env.DB_DATABASE,
     connectionLimit:10,
-
+    multipleStatements: true,
 });
-
+//try catch 필요한가?
 function getConnection(callback){
     dbPool.getConnection( function(err, conn ){
         if(!err){

@@ -16,6 +16,10 @@
     + MySql
         + connection, connection pool 
         + call query, call sp
+        + transaction : 아이템 사고/팔기
+            + multi query로 처리
+            + update는 result.changedRows > 0
+            + insert/delete는 result.affectdRows > 0 로 DB 반영 되었는지 체크
 
     + 싱글 플레이 게임
         + 인벤토리 - 전체 아이템 보기, 아이템 팔기
@@ -28,6 +32,7 @@
             + 코인 차감(DB 처리)
         + 게임 종료 : DELETE
             + 게임 클리어시 얻은 자원은 서버에서 처리
+        + 아이템 사고/팔기에 머니 증/차감 추가
 
     + 멀티 플레이를 위한 서버간 이동 구현 테스트
         + node js 로만 구현해봄
@@ -35,10 +40,6 @@
 
 
 + 작업중
-    + 싱글 플레이 게임
-        + 아이템 구입 및 판매시 money Update 추가
-            + item_table, account 테이블을 동시에 update
-                + transaction or multi query 찾아보자
 
 + TODO
     + 싱글 플레이 게임
