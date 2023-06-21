@@ -15,11 +15,14 @@
 
     + MySql
         + connection, connection pool 
+            + pool.query() 시에는 release가 필요 없다.
         + call query, call sp
         + transaction : 아이템 사고/팔기
             + multi query로 처리
-            + update는 result.changedRows > 0
+            + update는 result.changedRows > 0 : 쿼리에 따라서 changedRows == 0이 정상일수도 있으니 주의
             + insert/delete는 result.affectdRows > 0 로 DB 반영 되었는지 체크
+        + module 변경 : mysql -> mysql2
+            + require('mysql2/promise') .....
 
     + 싱글 플레이 게임
         + 인벤토리 - 전체 아이템 보기, 아이템 팔기

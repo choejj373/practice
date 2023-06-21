@@ -109,7 +109,7 @@ const process = {
         const response = await user.login();
         if( response.success )
         {
-            console.log( response );
+            // console.log( response );
             req.session.key = req.body.id;
             req.session.user_id = req.body.id;
             req.session.user_name = response.name;

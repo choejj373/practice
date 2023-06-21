@@ -45,6 +45,7 @@ class User{
         const body = this.body;
 
         const userInfo = await UserStorage.getUserInfo( body.id );
+        // console.log( userInfo );
         if( userInfo ){
 
             const hashedPwd = await makePasswordHashed( userInfo.salt, body.psword );
