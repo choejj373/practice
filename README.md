@@ -16,6 +16,7 @@
     + MySql
         + connection, connection pool 
             + pool.query() 시에는 release가 필요 없다.
+                + 잘 안된다는 이야기가 좀 있던데;
         + call query, call sp
         + transaction : 아이템 사고/팔기
             + multi query로 처리
@@ -43,6 +44,8 @@
 
 
 + 작업중
+    + 멀티 플레이
+        + 간단한 매칭과 서버 이동후 채팅룸 조인
 
 + TODO
     + 싱글 플레이 게임
