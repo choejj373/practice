@@ -24,6 +24,12 @@
             + insert/delete는 result.affectdRows > 0 로 DB 반영 되었는지 체크
         + module 변경 : mysql -> mysql2
             + require('mysql2/promise') .....
+    + redis
+        + GCP 에 VM INSTANCE 무료 생성
+        + 우분투에 redis 설치
+        + 로컬에서 redis 연결 성공
+        + Session저장시 문제 발생
+            + connect-redis 변경에 따른 문제로 보임...
 
     + 싱글 플레이 게임
         + 인벤토리 - 전체 아이템 보기, 아이템 팔기
@@ -33,19 +39,25 @@
             + 머니 ( 보상 )    
             + 로비 화면 처음 get시에 유저 정보 db에서 가져오기
         + 게임 시작 : POST
-            + 코인 차감(DB 처리)
+            + 배틀 코인 차감
         + 게임 종료 : DELETE
-            + 게임 클리어시 얻은 자원은 서버에서 처리
+            + 게임 클리어시 얻은 자원(머니)은 서버에서 추가
         + 아이템 사고/팔기에 머니 증/차감 추가
 
     + 멀티 플레이를 위한 서버간 이동 구현 테스트
-        + node js 로만 구현해봄
+        + node js 로만 구현해봄 (feat. socket.io)
+        + 간단한 매치 메이킹
         + https://github.com/choejj373/multigame
 
 
 + 작업중
+    + redis
+        + Session 저장
+        + DB Caching         
+
     + 멀티 플레이
-        + 간단한 매칭과 서버 이동후 채팅룸 조인
+        + 간단한 매칭 완료
+        + 서버 이동후 채팅룸 조인
 
 + TODO
     + 싱글 플레이 게임
@@ -78,8 +90,6 @@
         + 멀티 플레이 서버로의 접속 보안 강화
             + 멀티 플레이 서버에서 방생성시 userid, 생성된 roomid, pwd를 보관한다.
             + 해당 정보를 싱글 플레이 서버에서 받아 클라이언트는 멀티 플레이 서버 접속시 인증 및 Join 요청
-    + redis
-        + linux 혹은 windows 64bit 설치 필요
 
     + 보안
         + https
