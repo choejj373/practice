@@ -6,7 +6,7 @@
         + 패스워드 암호화
 
     + Session
-        + mysql, memchached 저장소 테스트 완료
+        + mysql, memchached, redis 저장소 테스트 완료
         + 자동 만료 테스트 완
         
     + 채팅 
@@ -24,12 +24,13 @@
             + insert/delete는 result.affectdRows > 0 로 DB 반영 되었는지 체크
         + module 변경 : mysql -> mysql2
             + require('mysql2/promise') .....
+            
     + redis
         + GCP 에 VM INSTANCE 무료 생성
         + 우분투에 redis 설치
         + 로컬에서 redis 연결 성공
-        + Session저장시 문제 발생
-            + connect-redis 변경에 따른 문제로 보임...
+        + Session 저장시 문제 해결 : redis -> ioredis로 변경
+
 
     + 싱글 플레이 게임
         + 인벤토리 - 전체 아이템 보기, 아이템 팔기
@@ -52,11 +53,9 @@
 
 + 작업중
     + redis
-        + Session 저장
         + DB Caching         
 
     + 멀티 플레이
-        + 간단한 매칭 완료
         + 서버 이동후 채팅룸 조인
 
 + TODO
