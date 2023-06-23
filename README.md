@@ -1,49 +1,42 @@
 # Node.js 관련 연습용 프로젝트
++ 개발 환경
+    + Node.js, mysql - windows : local
+    + redis  - linux : google cloud platform
+    + github
 
-+ 구현 완료된 기능
++ 구현된 기능
     + 회원 가입 및 로그인 
-        + MySql에 저장 
+        + 회원 정보는 MySql에 저장 
         + 패스워드 암호화
 
     + Session
-        + mysql, memchached, redis 저장소 테스트 완료
-        + 자동 만료 테스트 완
+        + mysql, memchached, redis, memory store 테스트 완료
         
     + 채팅 
         + Websocket
-        + 로그인된 클라이언트간 채팅 : 서버내 전체 채팅
+        + 로그인된 클라이언트간 채팅
 
     + MySql
         + connection, connection pool 
-            + pool.query() 시에는 release가 필요 없다.
-                + 잘 안된다는 이야기가 좀 있던데;
         + call query, call sp
-        + transaction : 아이템 사고/팔기
-            + multi query로 처리
-            + update는 result.changedRows > 0 : 쿼리에 따라서 changedRows == 0이 정상일수도 있으니 주의
-            + insert/delete는 result.affectdRows > 0 로 DB 반영 되었는지 체크
-        + module 변경 : mysql -> mysql2
-            + require('mysql2/promise') .....
+        + transaction
             
     + redis
-        + GCP 에 VM INSTANCE 무료 생성
-        + 우분투에 redis 설치
-        + 로컬에서 redis 연결 성공
-        + Session 저장시 문제 해결 : redis -> ioredis로 변경
-
-
-    + 싱글 플레이 게임
+        + sessin 저장
+    
+    + 게임 기본 기능
+        + http
         + 인벤토리 - 전체 아이템 보기, 아이템 팔기
         + 상점 - 아이템 구입
-        + 자원 추가
-            + 배틀 코인(싱글 플레이용)
-            + 머니 ( 보상 )    
-            + 로비 화면 처음 get시에 유저 정보 db에서 가져오기
+        + 게임 머니 증/차감 
+
+    + 싱글 플레이 게임
+        + http
         + 게임 시작 : POST
             + 배틀 코인 차감
         + 게임 종료 : DELETE
-            + 게임 클리어시 얻은 자원(머니)은 서버에서 추가
-        + 아이템 사고/팔기에 머니 증/차감 추가
+            + 게임 클리어시 보상(게임 머니)
+
 
     + 멀티 플레이를 위한 서버간 이동 구현 테스트
         + node js 로만 구현해봄 (feat. socket.io)
