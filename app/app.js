@@ -12,7 +12,32 @@ const app = express();
 const minute = 1000 * 60;
 const hour = minute * 60;
 
+/**---------------------------------------------------------------*/
+const Redis = require('ioredis');
+const RedisStore = require('connect-redis').default;
 
+const redis = new Redis({
+    host:process.env.REDIS_HOST,
+    port:process.env.REDIS_PORT,
+    password:process.env.REDIS_PASSWORD,    
+})
+
+let redisStore = new RedisStore({
+    client: redis,
+})
+
+app.use( session({
+    resave: false,
+    saveUninitialized:false,
+    secret: process.env.COOKIE_SECRET,
+    // name: "aaaa",
+    cookie:{
+        httpOnly:true,
+        secure:false,
+        maxAge: minute * 5,
+    },
+    store: redisStore
+}))
 /**---------------------------------------------------------------*/
 // MemoryStore For Dev
 // app.use(
@@ -50,7 +75,7 @@ const hour = minute * 60;
 // app.use( session(sessionOption));
 
 /**---------------------------------------------------------------*/
-const MySqlStore = require("express-mysql-session")(session);
+/*const MySqlStore = require("express-mysql-session")(session);
 const options = {
     host: "localhost",
     port: 3306,
@@ -77,7 +102,7 @@ app.use(
             maxAge: minute * 5,
         }
     })
-);
+);*/
 
 
 const home = require("./src/routes/home");
