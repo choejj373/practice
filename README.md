@@ -1,4 +1,4 @@
-# Node.js 관련 모바일 게임 프로젝트( 연습용 )
+# Node.js 관련 모바일 게임 서버 프로젝트( 연습용 )
 + 개발 환경
     + Node.js, mysql - windows : local
     + redis  - linux : google cloud platform
@@ -22,7 +22,7 @@
         + transaction
             
     + redis
-        + sessin 저장
+        + session 저장
     
     + 게임 기본 기능
         + http
