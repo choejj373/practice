@@ -82,7 +82,7 @@ const process = {
         const response = await UserStorage.buyItem( req.session.user_id );
         if( response.success )
         {
-            console.log( JSON.stringify(response.items ) );
+            UserStorageCache.deleteItemAll(req.session.user_id);
         }
         return res.json(response);
     },
@@ -91,7 +91,7 @@ const process = {
         const response = await UserStorage.sellItem( req.session.user_id, req.body.item_uid );
         if( response.success )
         {
-            //console.log( JSON.stringify(response.items ) );
+            UserStorageCache.deleteItemAll(req.session.user_id);            
         }
         return res.json(response);
     },

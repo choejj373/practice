@@ -1,7 +1,7 @@
 # Node.js 관련 모바일 게임 서버 프로젝트( 연습용 )
 + 개발 환경
-    + Node.js, mysql - windows : local
-    + redis  - linux : google cloud platform
+    + Node.js, mysql    - windows : local
+    + redis             - linux : google cloud platform
     + github
 
 + 구현된 기능
@@ -23,6 +23,7 @@
             
     + redis
         + session 저장
+        + DB Caching : 아이템 관련
     
     + 게임 기본 기능
         + http
@@ -47,6 +48,8 @@
 + 작업중
     + redis
         + DB Caching         
+            + db write 시에는 일단 캐쉬 삭제
+            + Caching 시간 설정
 
     + 멀티 플레이
         + 서버 이동후 채팅룸 조인

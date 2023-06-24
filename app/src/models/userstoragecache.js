@@ -68,7 +68,11 @@ class UserStorageCache{
             console.log( `${user_id}:item`);*/
             redisCli.hSet( `${user_id}:item`, element.item_uid, JSON.stringify( element) );
         });
+        redisCli.expire( `${user_id}:item`, 60 );
+    }
 
+    static deleteItemAll( user_id){
+        redisCli.del( `${user_id}:item` );
     }
 }
 
