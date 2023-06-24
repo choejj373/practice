@@ -144,14 +144,20 @@ const process = {
         }
         return res.json(response)},
     startsinglegame : async( req, res)=>{
-            console.log( "process.singlegame : ", req.session.user_id );
+            console.log( "process.startsinglegame : ", req.session.user_id );
             const response = await UserStorage.startSingleGame( req.session.user_id );
+            req.session.isStartSingleGame = true;
             return res.json(response);
         },
     endsinglegame : async(req,res)=>{
-        console.log( 'delete singlegame : ', req.session.user_id );
-        const response = await UserStorage.addUserMoney( req.session.user_id, 100 );
-        return res.json( {success:true} );
+        console.log( 'delete endsinglegame : ', req.session.user_id );
+
+        let response = { success:false};
+        if( req.session.isStartSingleGame ){
+            response = await UserStorage.addUserMoney( req.session.user_id, 100 );
+            req.session.isStartSingGame = false;
+        }
+        return res.json( response );
     },
     
 }

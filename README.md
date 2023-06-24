@@ -25,6 +25,8 @@
         + session 저장
         + DB Caching : 아이템 관련
     
+    + LogSystem : Winston
+
     + 게임 기본 기능
         + http
         + 인벤토리 - 전체 아이템 보기, 아이템 팔기
@@ -46,10 +48,7 @@
 
 
 + 작업중
-    + redis
-        + DB Caching         
-            + db write 시에는 일단 캐쉬 삭제
-            + Caching 시간 설정
+  
 
     + 멀티 플레이
         + 서버 이동후 채팅룸 조인
@@ -66,7 +65,7 @@
     + 관리 기능
         + user 삭제 - account 와 item 동시 삭제 
 
-    + LogSystem : Winston
+    + LogSystem : Morgan
 
     + 우편 시스템
         + DB

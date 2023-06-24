@@ -4,8 +4,18 @@ const express = require("express");
 const dotenv = require ("dotenv");
 const session = require("express-session");
 
+const logger = require("./src/config/logger")
+
 
 dotenv.config();
+
+
+logger.error("error");
+logger.warn("warning");
+logger.info("info");
+logger.verbose("verbose");
+logger.debug("debug");
+logger.silly("silly");
 
 const app = express();
 
@@ -106,6 +116,7 @@ app.use(
 
 
 const home = require("./src/routes/home");
+const { log } = require("winston");
 
 app.set("views", "./src/views" );
 app.set("view engine", "ejs");
