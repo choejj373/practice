@@ -3,6 +3,7 @@
 //const UserStorage = require("../../models/userstorage");
 const User = require("../../models/user");
 const UserStorage = require("../../models/userstorage");
+const UserStorageCache = require("../../models/userstoragecache");
 
 const output = {
     test : ( req,res )=>{
@@ -96,10 +97,21 @@ const process = {
     },
     inventory_get_all: async(req,res)=>{
         console.log( 'process.inventory_get_all : ', req.session.user_id );
-        const response = await UserStorage.getItems( req.session.user_id );
-        if( response.success )
+
+        let response;
+        response = await UserStorageCache.getItemAll( req.session.user_id )
+        console.log( response.success );
+        if( response.success === true)
         {
-            console.log( JSON.stringify(response.items ) );
+            console.log("Cache Hit");
+        }else{
+            console.log("Cache no hit");
+            response = await UserStorage.getItems( req.session.user_id );
+            if( response.success )
+            {
+                // console.log( response );
+                UserStorageCache.saveItemAll( req.session.user_id, response.items );
+            }
         }
         return res.json(response);
     },

@@ -83,7 +83,7 @@ class UserStorage{
         let retVal = { success: false};
         try{
             const result = await conn.query("SELECT * FROM item_table WHERE owner = ?;", [user_id] );
-            console.log( result[0] );
+            // console.log( result[0] );
             retVal.success = true;
             retVal.items = result[0];
         }catch(err)
