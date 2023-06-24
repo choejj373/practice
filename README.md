@@ -1,4 +1,4 @@
-# Node.js 관련 연습용 프로젝트
+# Node.js 관련 모바일 게임 프로젝트( 연습용 )
 + 개발 환경
     + Node.js, mysql - windows : local
     + redis  - linux : google cloud platform
