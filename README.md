@@ -11,6 +11,7 @@
 
     + Session
         + mysql, memchached, redis, memory store 테스트 완료
+        + http session 과 socket.io 연동
         
     + 채팅 
         + Websocket
@@ -48,7 +49,7 @@
 
 
 + 작업중
-  
+    + 매치 메이킹 서버/멀티 플레이 서버와 연동
 
     + 멀티 플레이
         + 서버 이동후 채팅룸 조인

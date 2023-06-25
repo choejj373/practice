@@ -35,16 +35,16 @@ const logger = winston.createLogger({
             zippedArchive: true,
         }),
     ],
-    exceptionHandlers: [
-        new winstonDaily({
-            level: 'error',
-            datePattern: 'YYYY-MM-DD',
-            dirname: logDir,
-            filename: `%DATE%.exception.log`,
-            maxFiles: 30,
-            zippedArchive: true,
-        }),
-    ],
+    // exceptionHandlers: [
+    //     new winstonDaily({
+    //         level: 'error',
+    //         datePattern: 'YYYY-MM-DD',
+    //         dirname: logDir,
+    //         filename: `%DATE%.exception.log`,
+    //         maxFiles: 30,
+    //         zippedArchive: true,
+    //     }),
+    // ],
 });
 
 if( process.env.MODE_ENV != 'SERVICE'){

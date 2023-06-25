@@ -10,6 +10,13 @@ const output = {
         UserStorage.test();
         res.render("home/test");
     },
+    matchmaking : ( req,res)=>{
+        if( req.session.key ){
+            res.render("home/matchmaking",{ sessionId : req.session.sessionId })
+        }else{
+            res.redirect("/login");
+        }
+    },
     store : ( req,res )=> {
         if( req.session.key ){
             res.render("home/store");

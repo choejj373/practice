@@ -4,18 +4,19 @@ const express = require("express");
 const dotenv = require ("dotenv");
 const session = require("express-session");
 
-const logger = require("./src/config/logger")
+// const logger = require("./src/config/logger")
 
 
 dotenv.config();
 
-
+/*
 logger.error("error");
 logger.warn("warning");
 logger.info("info");
 logger.verbose("verbose");
 logger.debug("debug");
 logger.silly("silly");
+*/
 
 const app = express();
 
@@ -36,7 +37,7 @@ let redisStore = new RedisStore({
     client: redis,
 })
 
-app.use( session({
+const sessionMiddleware = session({
     resave: false,
     saveUninitialized:false,
     secret: process.env.COOKIE_SECRET,
@@ -47,7 +48,8 @@ app.use( session({
         maxAge: minute * 5,
     },
     store: redisStore
-}))
+});
+app.use( sessionMiddleware );
 /**---------------------------------------------------------------*/
 // MemoryStore For Dev
 // app.use(
