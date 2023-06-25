@@ -11,35 +11,35 @@ const output = {
         res.render("home/test");
     },
     matchmaking : ( req,res)=>{
-        if( req.session.key ){
+        if( req.session ){
             res.render("home/matchmaking",{ sessionId : req.session.sessionId })
         }else{
             res.redirect("/login");
         }
     },
     store : ( req,res )=> {
-        if( req.session.key ){
+        if( req.session ){
             res.render("home/store");
         }else{
             res.redirect("/login");        
         }
     },
     inventory : ( req,res )=> {
-        if( req.session.key ){
+        if( req.session ){
             res.render("home/inventory");
         }else{
             res.redirect("/login");        
         }
     },
     chat : (req,res)=>{
-        if( req.session.key ){
+        if( req.session ){
             res.render("home/chat");
         }else{
             res.redirect("/login");        
         }
     },
     home : async (req, res) => {
-        console.log( req.session.isLogined );
+        // console.log( req.session );
         if( req.session.key ){
             console.log( "output.home logined - ", req.session.user_name );
 
@@ -128,7 +128,6 @@ const process = {
         const response = await user.login();
         if( response.success )
         {
-            // console.log( response );
             req.session.key = req.body.id;
             req.session.user_id = req.body.id;
             req.session.user_name = response.name;

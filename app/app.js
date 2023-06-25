@@ -2,6 +2,8 @@
 
 const express = require("express");
 const dotenv = require ("dotenv");
+
+const cookieParser = require('cookie-parser');
 const session = require("express-session");
 
 // const logger = require("./src/config/logger")
@@ -17,39 +19,13 @@ logger.verbose("verbose");
 logger.debug("debug");
 logger.silly("silly");
 */
-
-const app = express();
-
 const minute = 1000 * 60;
 const hour = minute * 60;
 
-/**---------------------------------------------------------------*/
-const Redis = require('ioredis');
-const RedisStore = require('connect-redis').default;
+const app = express();
 
-const redis = new Redis({
-    host:process.env.REDIS_HOST,
-    port:process.env.REDIS_PORT,
-    password:process.env.REDIS_PASSWORD,    
-})
 
-let redisStore = new RedisStore({
-    client: redis,
-})
-
-const sessionMiddleware = session({
-    resave: false,
-    saveUninitialized:false,
-    secret: process.env.COOKIE_SECRET,
-    // name: "aaaa",
-    cookie:{
-        httpOnly:true,
-        secure:false,
-        maxAge: minute * 5,
-    },
-    store: redisStore
-});
-app.use( sessionMiddleware );
+app.use(cookieParser(process.env.COOKIE_SECRET));
 /**---------------------------------------------------------------*/
 // MemoryStore For Dev
 // app.use(
@@ -89,11 +65,11 @@ app.use( sessionMiddleware );
 /**---------------------------------------------------------------*/
 /*const MySqlStore = require("express-mysql-session")(session);
 const options = {
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: "1214",
-    database: "practice",
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PSWORD,
+    database: process.env.DATABASE,
 
     clearExpired: true,
     checkExpirationInterval: minute,
@@ -116,9 +92,37 @@ app.use(
     })
 );*/
 
+const Redis = require('ioredis');
+const RedisStore = require('connect-redis').default;
+
+const redis = new Redis({
+    host:process.env.REDIS_HOST,
+    port:process.env.REDIS_PORT,
+    password:process.env.REDIS_PASSWORD,    
+})
+
+let redisStore = new RedisStore({
+    client: redis,
+})
+
+const sessionMiddleware = session({
+
+    resave: false,
+    saveUninitialized:false,
+    secret: process.env.COOKIE_SECRET,
+    // name: "aaaa",
+    cookie:{
+        httpOnly:true,
+        secure:false,
+        maxAge: minute * 5,
+    },
+    store: redisStore
+});
+
+app.use( sessionMiddleware );
 
 const home = require("./src/routes/home");
-const { log } = require("winston");
+// const { log } = require("winston");
 
 app.set("views", "./src/views" );
 app.set("view engine", "ejs");
@@ -130,5 +134,8 @@ app.use(express.urlencoded( { extended:true } ));
 
 app.use('/', home);
 
-module.exports = app;
+module.exports = {
+    app,
+    sessionMiddleware
+}
  

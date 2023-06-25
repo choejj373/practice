@@ -1,45 +1,78 @@
 
 "use strict";
-const session = require("express-session");
+//const session = require("express-session");
 
-const app = require("../app");
+const { app, sessionMiddleware } = require("../app");
 const PORT = process.env.PORT || 3000;
 
-
-const minute = 1000 * 60;
-const hour = minute * 60;
-
 /**---------------------------------------------------------------*/
-const Redis = require('ioredis');
-const RedisStore = require('connect-redis').default;
+// const Redis = require('ioredis');
+// const RedisStore = require('connect-redis').default;
 
-const redis = new Redis({
-    host:process.env.REDIS_HOST,
-    port:process.env.REDIS_PORT,
-    password:process.env.REDIS_PASSWORD,    
-})
+// const redis = new Redis({
+//     host:process.env.REDIS_HOST,
+//     port:process.env.REDIS_PORT,
+//     password:process.env.REDIS_PASSWORD,    
+// })
 
-let redisStore = new RedisStore({
-    client: redis,
-})
+// let redisStore = new RedisStore({
+//     client: redis,
+// })
 
-const sessionMiddleware = session({
-    resave: false,
-    saveUninitialized:false,
+// // const sessionMiddleware = session({
+// app.use( session({
+//     resave: false,
+//     saveUninitialized:false,
+//     secret: process.env.COOKIE_SECRET,
+//     // name: "aaaa",
+//     cookie:{
+//         httpOnly:true,
+//         secure:false,
+//         maxAge: minute * 5,
+//     },
+//     store: redisStore
+// }));
+/*
+const MySqlStore = require("express-mysql-session")(session);
+
+const options = {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PSWORD,
+    database: process.env.DATABASE,
+
+    clearExpired: true,
+    checkExpirationInterval: minute,
+    expiration: hour,
+};
+
+const sessionStore = new MySqlStore( options );
+
+app.use( session({
+    key: "session_cookie_name",
     secret: process.env.COOKIE_SECRET,
-    // name: "aaaa",
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: true,
+    rolling:true,
     cookie:{
-        httpOnly:true,
-        secure:false,
         maxAge: minute * 5,
-    },
-    store: redisStore
-});
+    } }) );
+*/
+   /* app.use(
+             session({
+                 secret:process.env.COOKIE_SECRET,
+                 resave:false,
+                 saveUninitialized: false, 
+             })
+         );*/
 
-app.use( sessionMiddleware );
+/**========================================================= */
+//app.use( sessionMiddleware );
 
 const server = app.listen(PORT, () =>{
-    console.log("서버 가동");
+    console.log("서버 가동 : ", PORT);
 });
 
 /**=========================================================== */
