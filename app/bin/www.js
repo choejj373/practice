@@ -1,75 +1,10 @@
 
 "use strict";
-//const session = require("express-session");
 
-const { app, sessionMiddleware } = require("../app");
+const app = require("../app").app;
+const sessionMiddleware = require("../app").sessionMiddleware;
+
 const PORT = process.env.PORT || 3000;
-
-/**---------------------------------------------------------------*/
-// const Redis = require('ioredis');
-// const RedisStore = require('connect-redis').default;
-
-// const redis = new Redis({
-//     host:process.env.REDIS_HOST,
-//     port:process.env.REDIS_PORT,
-//     password:process.env.REDIS_PASSWORD,    
-// })
-
-// let redisStore = new RedisStore({
-//     client: redis,
-// })
-
-// // const sessionMiddleware = session({
-// app.use( session({
-//     resave: false,
-//     saveUninitialized:false,
-//     secret: process.env.COOKIE_SECRET,
-//     // name: "aaaa",
-//     cookie:{
-//         httpOnly:true,
-//         secure:false,
-//         maxAge: minute * 5,
-//     },
-//     store: redisStore
-// }));
-/*
-const MySqlStore = require("express-mysql-session")(session);
-
-const options = {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PSWORD,
-    database: process.env.DATABASE,
-
-    clearExpired: true,
-    checkExpirationInterval: minute,
-    expiration: hour,
-};
-
-const sessionStore = new MySqlStore( options );
-
-app.use( session({
-    key: "session_cookie_name",
-    secret: process.env.COOKIE_SECRET,
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: true,
-    rolling:true,
-    cookie:{
-        maxAge: minute * 5,
-    } }) );
-*/
-   /* app.use(
-             session({
-                 secret:process.env.COOKIE_SECRET,
-                 resave:false,
-                 saveUninitialized: false, 
-             })
-         );*/
-
-/**========================================================= */
-//app.use( sessionMiddleware );
 
 const server = app.listen(PORT, () =>{
     console.log("서버 가동 : ", PORT);
@@ -80,14 +15,16 @@ const SocketIO = require("socket.io");
 const ioForClient = SocketIO( server, {path: "/socket.io"});
 
 /**=========================================================== */
+// 매치 메이킹 서버로의 접속
 const ioConnector = require("socket.io-client");
 const socketConnector = ioConnector.connect( process.env.MATCHMAKINGSVR_URL);
-/**=========================================================== */
+
 socketConnector.on('connection',()=>{
-    console.logcd("match making server is connected");
+    console.log("match making server is connected");
 });
+
 socketConnector.on("matched",(data)=>{
-     // 클라이언트에게 멀티플레이 서버로 접속
+     // 클라이언트에게 멀티플레이 서버로 이동
     const msg = JSON.parse( data )
     console.log( "matched : ", msg );
     ioForClient.to(msg.socketId).emit("move","http://localhost:3002");
@@ -95,9 +32,8 @@ socketConnector.on("matched",(data)=>{
 
 socketConnector.on("match-failed",(data)=>{
     console.log("match failed : " + data);
-    // 클라이언트에게 멀티플레이 서버로 접속
-    // ioForClient.emit("match-failed");
-    // ioForClient.to(data).emit("matchfailed")
+    const msg = JSON.parse( data )
+    ioForClient.to(msg.socketId).emit("move","http://localhost:3000/");
 })
 
 
@@ -114,12 +50,27 @@ ioForClient.use( (socket,next) =>{
 
 /**=========================================================== */
 ioForClient.on("connection", function( socket ){
-    console.log( socket.id, " connected...");
-    // console.log( socket.request.session);
+    console.log( socket.id, "is connected...");
 
-    socket.on("disconnect", function(reason){
-        console.log( socket.id, " : Disconnected")
+
+    socket.userId = socket.request.session.user_id;
+
+    socket.on("disconnect", (reason)=>{
+        console.log( socket.id, "is disconnected : ", reason)
+        console.log( socket.userId );
+        // 매치 메이킹 서버로 취소 알림
     });
+
+    socket.on("error", (err)=>{
+        console.log( socket.id, "is error : ",err)
+    });
+
+    if( !socketConnector.connected ){
+        console.warn("match making server is not running");
+        socket.emit("move","http://localhost:3000/");
+        return;
+    }
+
 
     socket.on('match', function(data){
         console.log("match : ");

@@ -6,12 +6,14 @@ const dotenv = require ("dotenv");
 const cookieParser = require('cookie-parser');
 const session = require("express-session");
 
-// const logger = require("./src/config/logger")
-
 
 dotenv.config();
 
-/*
+/**====================================================*/
+// For Log System
+/* const logger = require("./src/config/logger")
+const { log } = require("winston");
+
 logger.error("error");
 logger.warn("warning");
 logger.info("info");
@@ -19,6 +21,7 @@ logger.verbose("verbose");
 logger.debug("debug");
 logger.silly("silly");
 */
+
 const minute = 1000 * 60;
 const hour = minute * 60;
 
@@ -35,7 +38,9 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 //         saveUninitialized: false, 
 //     })
 // );
+
 /**---------------------------------------------------------------*/
+// 
 // const memcachedStore = require("connect-memcached")(session);
 // const cookieParser = require('cookie-parser');
 // app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -90,7 +95,9 @@ app.use(
             maxAge: minute * 5,
         }
     })
-);*/
+);
+
+ */
 
 const Redis = require('ioredis');
 const RedisStore = require('connect-redis').default;
@@ -110,7 +117,6 @@ const sessionMiddleware = session({
     resave: false,
     saveUninitialized:false,
     secret: process.env.COOKIE_SECRET,
-    // name: "aaaa",
     cookie:{
         httpOnly:true,
         secure:false,
@@ -122,7 +128,7 @@ const sessionMiddleware = session({
 app.use( sessionMiddleware );
 
 const home = require("./src/routes/home");
-// const { log } = require("winston");
+
 
 app.set("views", "./src/views" );
 app.set("view engine", "ejs");
@@ -134,8 +140,6 @@ app.use(express.urlencoded( { extended:true } ));
 
 app.use('/', home);
 
-module.exports = {
-    app,
-    sessionMiddleware
-}
  
+module.exports.app = app;
+module.exports.sessionMiddleware = sessionMiddleware;
