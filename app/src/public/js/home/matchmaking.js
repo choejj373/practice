@@ -9,10 +9,11 @@ socket.on('error', (err)=>{
 });
 
 socket.on('connect',()=>{
-    // const Id1 = "<%- sessionId%>";
-    // const Id2 = "<% sessionId%>";
     console.log("connected");
-    // console.log( local.sessionId );
-    // console.log( Id2 );
     socket.emit('match' );
 });
+
+socket.on("move", (data)=>{
+    console.log( "move: " + data );
+    window.location.href = data;    
+})

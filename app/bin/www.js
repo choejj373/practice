@@ -84,19 +84,20 @@ const ioConnector = require("socket.io-client");
 const socketConnector = ioConnector.connect( process.env.MATCHMAKINGSVR_URL);
 /**=========================================================== */
 socketConnector.on('connection',()=>{
-    logger.Info("match making server is connected");
+    console.logcd("match making server is connected");
 });
 socketConnector.on("matched",(data)=>{
-     console.log("matched : " + data);
      // 클라이언트에게 멀티플레이 서버로 접속
-    //  ioForClient.sockets.to(data)emit("move","http://localhost:3002");
+    const msg = JSON.parse( data )
+    console.log( "matched : ", msg );
+    ioForClient.to(msg.socketId).emit("move","http://localhost:3002");
 });
 
 socketConnector.on("match-failed",(data)=>{
     console.log("match failed : " + data);
     // 클라이언트에게 멀티플레이 서버로 접속
     // ioForClient.emit("match-failed");
-    // ioForClient.sockets.to(data).emit("matchfailed")
+    // ioForClient.to(data).emit("matchfailed")
 })
 
 

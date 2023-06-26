@@ -1,7 +1,7 @@
 # Node.js 관련 모바일 게임 서버 프로젝트( 연습용 )
 + 개발 환경
-    + Node.js, mysql    - windows : local
-    + redis             - linux : google cloud platform
+    + Node.js, mysql    on windows : local
+    + redis             on linux : google cloud platform
     + github
 
 + 구현된 기능
@@ -26,7 +26,8 @@
         + session 저장
         + DB Caching : 아이템 관련만 적용( hash )
     
-    + LogSystem : Winston
+    + LogSystem 
+        + Winston
 
     + 게임 기본 기능
         + http
@@ -49,11 +50,12 @@
         + 간단한 매치 메이킹, 간단한 서버 주도형 멀티 게임(pve)
         
 
-
 + 작업중
     + 매치 메이킹 서버/멀티 플레이 서버와 연동중
 
     + 멀티 플레이 게임
+
+    + 소스 정리 및 리펙토링
 
 + TODO
     + 싱글 플레이 게임
