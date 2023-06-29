@@ -14,9 +14,9 @@ const output = {
     matchmaking : ( req,res)=>{
         res.render("home/matchmaking",{ sessionId : req.session.sessionId })
     },
-    store : ( req,res )=> {
-        res.render("home/store");
-    },
+    // store : ( req,res )=> {
+    //     res.render("home/store");
+    // },
     inventory : ( req,res )=> {
         res.render("home/inventory");
     },
@@ -58,10 +58,31 @@ const output = {
 const process = {
     store: async(req,res)=>{
         console.log( 'process.store : ', req.userId );
-        const response = await UserStorage.buyItem( req.userId );
-        if( response.success )
+        console.log( req.body )        ;
+        // const body = JSON.parse( req.body );
+
+        let response = { success:false };
+
+        if( req.body.storeType === 1 )//일일 상점이라면
         {
-            UserStorageCache.deleteItemAll(req.userId);
+            const result = await UserStorage.isSoldOutDailyStore( req.userId, req.body.type )
+            console.log( result );
+
+            if( result.success ){
+                response.msg = result.msg;
+                return res.json(response);
+            }
+
+            switch( req.body.type )
+            {
+            case 1://무료 다이아
+                response = await UserStorage.getFreeDiamond( req.userId );
+                break;
+            case 2://골드 구입 아이템
+                break;
+            default://기타
+                break;
+            }
         }
         return res.json(response);
     },
@@ -168,11 +189,28 @@ const process = {
                 userName: userInfo.name,
                 userMoney : userInfo.money,
                 battleCoin : userInfo.battle_coin,
+                diamond : userInfo.diamond,
+                exp : userInfo.exp,
             });
 
         }else{
             return res.json( {success:false, msg:"not found user"})
         }
+    },
+    getTradeDailyStore : async ( req, res )=>{
+        console.log("get process.home userId:", req.userId);
+
+        const tradeInfo = await UserStorage.getTradeDailyStore( req.userId );
+
+        console.log( tradeInfo );
+
+        if( tradeInfo.length > 0 ){
+            // todo : 일단 무료 다이아만 처리하고 있다. 
+            if( tradeInfo[0].type === 1 ){
+                return res.json( {success:true, type:1 });  
+            }
+        }
+        return res.json( {success:true} );
     }
 }
 

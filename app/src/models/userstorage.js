@@ -41,6 +41,23 @@ class UserStorage{
             });
         });
     }
+
+    static async getTradeDailyStore( user_id ){
+        const conn = await dbPool.getConnection();
+        let retVal = [];
+
+        try{
+            const [row] = await conn.query("select * from trade_daily_store where user_id = ?;", [user_id] );
+            console.log( row );
+            retVal = row;
+        }catch( err ){
+            console.log( err );
+        }finally{
+            await conn.release();
+        }
+        return retVal;
+    }
+
     static async getUserInfo(id){
 
         const conn = await dbPool.getConnection();
@@ -133,6 +150,74 @@ class UserStorage{
         return retVal;
     };
 
+    static async isSoldOutDailyStore( user_id, type){
+        const conn = await dbPool.getConnection();
+        let retVal = { success:true , msg:'sold out'};
+        
+        try{
+            const sql1 = "SELECT * FROM trade_daily_store WHERE user_id = ? and type = ?";
+            const sql1a = [user_id, type]
+            const sql1s = mysql.format( sql1, sql1a );
+            console.log( sql1s );
+
+            const [row] = await conn.query( sql1s );
+
+            console.log( row );
+
+            if( Array.isArray(row) && row.length === 0 ) {
+                retVal = {success:false};
+            }
+        } catch( err ){
+            console.log( err );
+        } finally{
+            console.log( "finally");
+            await conn.release();
+        }
+        return retVal;
+    }
+
+    static async getFreeDiamond( user_id ){
+
+        const conn = await dbPool.getConnection();
+        let retVal = { success:false };
+
+        try{
+            const freeDiamond = 100;
+            const sql1 = "INSERT INTO trade_daily_store (user_id, type, value) values (?,?,?);";
+            const sql1a = [user_id, 1, freeDiamond]
+            const sql1s = mysql.format( sql1, sql1a );
+            console.log( sql1s );
+
+            
+            const sql2a = [freeDiamond, user_id]
+            const sql2 = "UPDATE account SET diamond = diamond + ? WHERE id = ?;";
+            const sql2s = mysql.format( sql2, sql2a );
+
+            console.log( sql2s );
+
+            await conn.beginTransaction();
+
+            const result = await conn.query( sql1s + sql2s );
+
+            console.log( result );
+
+            if( result[0][0].affectedRows > 0 && result[0][1].changedRows > 0 ) {
+                console.log( "commit");
+                await conn.commit();
+                retVal = {success:true};
+            }else{
+                console.log( "rollback : ");                            
+                await conn.rollback();
+            }
+        } catch( err ){
+            console.log( "rollback-", err );
+            await conn.rollback();
+        } finally{
+            console.log( "finally");
+            await conn.release();
+        }
+        return retVal;
+    };
     // 뭔가 지저분 그냥 sp를 호출할까? 아님 money를 일단 가져올까?
     static async buyItem( user_id ){
 

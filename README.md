@@ -14,7 +14,9 @@
         + http session 과 socket.io 연동
         
     + jwt 적용
-        + 하나의 token만 사용하여 cookie에 저장해둠
+        + 로그인시 token을 발급하여 cookie에 저장해둠
+        + token이 없거나 expired 된 token인 경우 재 로그인
+        + access token 과 refreh token으로 분리 : todo
     
     + MySql
         + connection, connection pool 
@@ -28,9 +30,9 @@
     
     + linux( centOS) / google cloud platform
         - node js 설치(+npm)
-        - git 설치
-            - github에서 소스 가져오기
-
+        - mysql 설치(8.0)
+        - github에서 소스 가져오기
+        - multiplayserver 실행
         - 최신 버젼들로 업데이트 : todo
 
     + LogSystem 
@@ -42,8 +44,8 @@
             + 5분마다 배틀 코인 충전( 최대 100 )
 
         + 상점 기능
-
-
+            + 일일 상점 
+                + 무료 다이아 얻기
 
     + 싱글 플레이 게임
         + http
@@ -72,16 +74,19 @@
 
     + XX 특공대 모작중
         + 상점 기능
-            + 일일 무료 아이템 얻는 기능
-                + 골드, 다이아, 아이템 등
+            + 일일 상점 : 매일 정해진 시간에 reset
+                + 무료 다이아,
+                + 골드 구입 아이템(todo)
+                + 다이아 구입 아이템(todo)
 
-            + 골드로 기본 아이템 구입
-            
             + 다이아로 유료 아이템 구입
+                + 부위별 장비 아이템 구입(ing)
+
+            + 다이아 구입
 
         + 장비 기능
             + 장착 : itemTable에 장착 컬럼 추가
-            + 팔기
+            + 버리기
 
 + TODO
     + jwt
@@ -127,7 +132,6 @@
         + 랭킹( sorted set )
     
     + linux
-        + node js 설치
 
     + gcp
         + ftp 연결
