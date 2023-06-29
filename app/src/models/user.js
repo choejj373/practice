@@ -2,7 +2,7 @@
 
 const UserStorage = require("./userstorage");
 const crypto = require("crypto");
-const jwt = require('../modules/jwt');
+
 
 const createSalt = () => 
     new Promise(( resolve, reject) =>{
@@ -51,7 +51,6 @@ class User{
         console.log( "UserInfo : ",userInfo );
         if( userInfo ){
 
-            const jwtToken = await jwt.sign( userInfo );
 
             const hashedPwd = await makePasswordHashed( userInfo.salt, body.psword );
             if( userInfo.id === this.body.id && userInfo.psword === hashedPwd){

@@ -16,23 +16,27 @@
     + jwt 적용
         + 하나의 token만 사용하여 cookie에 저장해둠
     
-    + 채팅 
-        + Websocket
-        + 로그인된 클라이언트간 채팅
-
     + MySql
         + connection, connection pool 
         + call query, call sp
         + transaction
+        + scheduler
             
     + redis
         + session 저장
         + DB Caching : 아이템 관련만 적용( hash )
     
+    + linux( centOS) / google cloud platform
+        - node js 설치(+npm)
+        - git 설치
+            - github에서 소스 가져오기
+
+        - 최신 버젼들로 업데이트 : todo
+
     + LogSystem 
         + Winston
 
-    + 게임 기본 기능
+    + 게임 기본 기능 => XX 특공대 모작중
         + http
         + 인벤토리 - 전체 아이템 보기, 아이템 팔기
         + 상점 - 아이템 구입
@@ -54,21 +58,27 @@
         + 멀티 플레이 서버 
             + 매칭된 클라이언트가 모두 접속하면 게임이 시작되고 일정 시간이 지나면 게임 종료
         
+        + 간단한 서버 주도형 멀티 게임(pve) : ing
+
+    + 채팅 
+        + Websocket
+        + 로그인된 클라이언트간 채팅
+
+
 + 작업중
 
-    + linux( centOS),gcp
-        - node js 설치(+npm)
-        - git 설치
-            - github에서 소스 가져오기
+    + XX 특공대 모작중
+        + 5분마다  battlecoin 충전( 최대 100 )
+            + mysql scheduler
 
-        - 최신 버젼들로 업데이트 : todo
+        + 상점 기능
+            + 일일 무료 아이템 기능
+            + 골드로 기본 아이템 구입
+            + 다이아로 유료 아이템 구입
 
-    
-    + 멀티 플레이 게임
-        +간단한 서버 주도형 멀티 게임(pve)
-
-
-
+        + 장비 기능
+            + 장착 : itemTable에 장착 컬럼 추가
+            + 팔기
 
 + TODO
     + jwt

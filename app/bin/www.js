@@ -1,8 +1,8 @@
 
 "use strict";
 
-const app = require("../app").app;
-const sessionMiddleware = require("../app").sessionMiddleware;
+const app = require("../app");
+// const sessionMiddleware = require("../app").sessionMiddleware;
 
 const PORT = process.env.PORT || 3000;
 
@@ -39,14 +39,15 @@ socketConnector.on("match-failed",(data)=>{
 
 /**=========================================================== */
 // http session과 연동
-const wrap = (middleware) => (socket,next) => middleware(socket.request, socket.request.res || {}, next);
+
+/*const wrap = (middleware) => (socket,next) => middleware(socket.request, socket.request.res || {}, next);
 ioForClient.use( wrap( sessionMiddleware));
 ioForClient.use( (socket,next) =>{
     const session = socket.request.session;
     // console.log( session.userId );
     // 인증 안된 session이라면 여기서 접속 차단 가능하다.아니면 on connection에서도 가능
     next();
-});
+});*/
 
 /**=========================================================== */
 ioForClient.on("connection", function( socket ){

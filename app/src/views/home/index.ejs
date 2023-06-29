@@ -3,18 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/home/home.js" defer> </script>
     <title>Document</title>
 </head>
 <body>
-    <%= user_name %> 님 어서오세요 <br>
-    Money : <%= user_money %><br>
-    BattleCoin : <%= battle_coin %><br>
-    여기는 로비 입니다<br>
+    <div id = "userInfo" style = "width:600px;height:25px;background-color:yellow">
+        이름<input id = "name" type="text" value="guest" style="width:50px" readonly></intput>
+        경험치<input id = "exp" type="text" value="0" style="width:50px" readonly></intput>
+        배틀코인<input id = "battlecoin" type="text" value="0" style="width:50px" readonly></intput>
+        다이아몬드<input id = "diamond" type="text" value="0" style="width:50px" readonly></intput>
+        골드<input id = "money" type="text" value="0" style="width:50px" readonly></intput> 
 
-    <a href="/matchmaking">Multi Game</a><br>
-    <a href="/inventory">Inventory</a><br>
-    <a href="/store">Store</a><br>
-    <a href="/singlegame">Single Game</a><br>
-    <a href="/logout">Logout</a><br>
+    </div>
+    <div id = "mainView" style = "width:600px; height:200px;background-color:#CF0">
+        <div id="mainStore" style = "display:none;">
+            <a href="/store">Store</a>
+        </div>
+        <div id="mainInven" style = "display:none;">
+            <a href="/inventory">Inventory</a>
+        </div>
+        <div id="mainCombat" style = "display:none;">
+            <a href="/singlegame">Single Game</a>
+        </div>
+
+
+
+    </div>
+    <div id = "navBottom" style = "width:600px;background-color:cyan">
+        <input id = "store" type="button" value="상점"></intput>
+        <input id = "inven" type="button" value="장비"></intput>
+        <input id = "combat" type="button" value="전투"></intput>
+        <input id = "challenge" type="button" value="도전"></intput>
+        <input id = "evolution" type = "button" value="진화"></intput>
+        <input id = "logout" type="button" value="접속종료"></intput>
+    </div>
 </body>
 </html>

@@ -31,29 +31,16 @@ const output = {
 
         console.log( userInfo );
 
-        if( userInfo ){
-            res.render("home/index",{
-                user_name: userInfo.name,
-                user_money : userInfo.money,
-                battle_coin : userInfo.battle_coin,
-            });
-        }else{
-       
-            res.render("home/index",{
-                user_name: "",
-                user_money : 0,
-                battle_coin : 0,
-            });
-        }
+        res.render("home/index")
     },
 
-    logout: (req,res) => {
-        console.log("output.logout");
-        // req.session.destroy();
-        res.clearCookie('token');
+    // logout: (req,res) => {
+    //     console.log("output.logout");
+    //     // req.session.destroy();
+    //     res.clearCookie('token');
 
-        res.render("home/logout");
-    },
+    //     res.render("home/logout");
+    // },
     login : (req, res) => {
         console.log( "output.login" );
         res.render("home/login");
@@ -118,7 +105,7 @@ const process = {
             
             const cookieOption = {
                 httpOnly: true,
-                maxAge : 600000,
+                maxAge : 1000 * 60 * 60,
                 secure : false,
                 // 1 more
             }
@@ -162,7 +149,31 @@ const process = {
         // }
         return res.json( response );
     },
-    
+    logout : (req, res) =>{
+        console.log("output.logout");
+
+        res.clearCookie('token');
+
+        return res.json( {success:true});
+    },
+    getuserinfo : async ( req,res ) =>{
+        console.log("get process.home userId:", req.userId);
+
+        const userInfo = await UserStorage.getUserInfo( req.userId );
+
+        console.log( userInfo );
+
+        if( userInfo ){
+            return res.json( {success:true, 
+                userName: userInfo.name,
+                userMoney : userInfo.money,
+                battleCoin : userInfo.battle_coin,
+            });
+
+        }else{
+            return res.json( {success:false, msg:"not found user"})
+        }
+    }
 }
 
 module.exports = {

@@ -142,5 +142,5 @@ app.use(express.urlencoded( { extended:true } ));
 app.use('/', home);
 
  
-module.exports.app = app;
+module.exports = app;
 // module.exports.sessionMiddleware = sessionMiddleware;
