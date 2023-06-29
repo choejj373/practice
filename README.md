@@ -89,12 +89,19 @@
             + 버리기
 
 + TODO
-    + jwt
-        + access token 과 refresh token 분리
-
     + typescript
-    
     + protobuf
+    + 관리 기능
+        + user 삭제 - account 와 item 동시 삭제 
+    + LogSystem : Morgan
+    + 우편 시스템 
+    + 공지
+    + 채팅  
+        + 길드 채팅 
+    + redis
+        + 랭킹( sorted set )
+    + gcp
+        + ftp 연결
 
     + 싱글 플레이 게임
         + 게임 시작시 Session에 게임 시작 정보 저장
@@ -104,23 +111,6 @@
         + 게임 종료시 나머지 시간동안 얻었던 자원 습득 요청
             + Session에 싱글 게임 종료 저장
 
-    + 관리 기능
-        + user 삭제 - account 와 item 동시 삭제 
-
-    + LogSystem : Morgan
-
-    + 우편 시스템
-        + DB
-            + mail_table
-            + mail_attached_item_table
-        + 우편 보기
-        + 우편 보내기
-            + 알림
-        + 공지( 별도 시스템으로 ?)
-    
-    + 채팅  
-        + 길드 채팅 
-
     + 멀티 게임 
         + 멀티 플레이 서버로의 접속 보안 강화
             + 멀티 플레이 서버에서 방생성시 userid, 생성된 roomid, pwd를 보관한다.
@@ -128,17 +118,10 @@
             
         + 간단한 멀티 게임
             + 서버에서 관리되는 간단한 보드 게임 제작
-    + redis
-        + 랭킹( sorted set )
-    
-    + linux
-
-    + gcp
-        + ftp 연결
 
     + 보안
         + https
-        + websocket은 별도 암호화 필요한가?
+        + websocket도 별도 암호화 필요하다.
         
     + 구글 계정으로 가입 및 로그인
 
