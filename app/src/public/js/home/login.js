@@ -22,12 +22,12 @@ function login() {
     })
     .then( (res) => res.json()) // json() promise
     .then( (res) => {
-        //console.log( res);
+        console.log( res);
         if( res.success ){
             location.href = "/";
         } else {
           alert( res.msg ); //=> cathc 발생
-          //  location.href = "/login"
+            location.href = "/login"
         }
     })
 };

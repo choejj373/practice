@@ -1,4 +1,5 @@
 "use strict";
+const jwt = require('../../modules/jwt');
 
 //const UserStorage = require("../../models/userstorage");
 const User = require("../../models/user");
@@ -11,62 +12,46 @@ const output = {
         res.render("home/test");
     },
     matchmaking : ( req,res)=>{
-        if( req.session ){
-            res.render("home/matchmaking",{ sessionId : req.session.sessionId })
-        }else{
-            res.redirect("/login");
-        }
+        res.render("home/matchmaking",{ sessionId : req.session.sessionId })
     },
     store : ( req,res )=> {
-        if( req.session ){
-            res.render("home/store");
-        }else{
-            res.redirect("/login");        
-        }
+        res.render("home/store");
     },
     inventory : ( req,res )=> {
-        if( req.session ){
-            res.render("home/inventory");
-        }else{
-            res.redirect("/login");        
-        }
+        res.render("home/inventory");
     },
     chat : (req,res)=>{
-        if( req.session ){
-            res.render("home/chat");
-        }else{
-            res.redirect("/login");        
-        }
+        res.render("home/chat");
     },
     home : async (req, res) => {
-        // console.log( req.session );
-        if( req.session.key ){
-            console.log( "output.home logined - ", req.session.user_name );
+        
+        console.log("output.home userId:", req.userId);
 
-            const userInfo = await UserStorage.getUserInfo( req.session.user_id );
+        const userInfo = await UserStorage.getUserInfo( req.userId );
 
-            if( userInfo ){
-                res.render("home/index",{
-                    user_name: userInfo.name,
-                    user_money : userInfo.money,
-                    battle_coin : userInfo.battle_coin,
-                });
-            }else{
-                res.render("home/index",{
-                    user_name: "",
-                    user_money : 0,
-                    battle_coin : 0,
-                });
-            }
+        console.log( userInfo );
 
+        if( userInfo ){
+            res.render("home/index",{
+                user_name: userInfo.name,
+                user_money : userInfo.money,
+                battle_coin : userInfo.battle_coin,
+            });
         }else{
-            console.log( "output.home not logined" );
-            res.redirect("/login");
+       
+            res.render("home/index",{
+                user_name: "",
+                user_money : 0,
+                battle_coin : 0,
+            });
         }
     },
+
     logout: (req,res) => {
         console.log("output.logout");
-        req.session.destroy();
+        // req.session.destroy();
+        res.clearCookie('token');
+
         res.render("home/logout");
     },
     login : (req, res) => {
@@ -85,39 +70,39 @@ const output = {
 
 const process = {
     store: async(req,res)=>{
-        console.log( 'process.store : ', req.session.user_id );
-        const response = await UserStorage.buyItem( req.session.user_id );
+        console.log( 'process.store : ', req.userId );
+        const response = await UserStorage.buyItem( req.userId );
         if( response.success )
         {
-            UserStorageCache.deleteItemAll(req.session.user_id);
+            UserStorageCache.deleteItemAll(req.userId);
         }
         return res.json(response);
     },
     inventory_sell_item: async(req,res)=>{
         console.log( 'process.inventory_sell_item : ', req.body.item_uid );
-        const response = await UserStorage.sellItem( req.session.user_id, req.body.item_uid );
+        const response = await UserStorage.sellItem( req.userId, req.body.item_uid );
         if( response.success )
         {
-            UserStorageCache.deleteItemAll(req.session.user_id);            
+            UserStorageCache.deleteItemAll(req.userId);
         }
         return res.json(response);
     },
     inventory_get_all: async(req,res)=>{
-        console.log( 'process.inventory_get_all : ', req.session.user_id );
+        console.log( 'process.inventory_get_all : ', req.userId );
 
         let response;
-        response = await UserStorageCache.getItemAll( req.session.user_id )
+        response = await UserStorageCache.getItemAll( req.userId )
         console.log( response.success );
         if( response.success === true)
         {
             console.log("Cache Hit");
         }else{
             console.log("Cache no hit");
-            response = await UserStorage.getItems( req.session.user_id );
+            response = await UserStorage.getItems( req.userId );
             if( response.success )
             {
                 // console.log( response );
-                UserStorageCache.saveItemAll( req.session.user_id, response.items );
+                UserStorageCache.saveItemAll( req.userId, response.items );
             }
         }
         return res.json(response);
@@ -126,15 +111,23 @@ const process = {
         console.log( "process.login" );
         const user = new User( req.body );
         const response = await user.login();
+        console.log( response );
         if( response.success )
         {
-            req.session.key = req.body.id;
-            req.session.user_id = req.body.id;
-            req.session.user_name = response.name;
+            const jwtToken = await jwt.sign( user.userId );
+            
+            const cookieOption = {
+                httpOnly: true,
+                maxAge : 600000,
+                secure : false,
+                // 1 more
+            }
 
-            req.session.save( () => {
-            // return res.json(response);  
-            });
+            res.cookie( 'token', jwtToken.token, cookieOption );
+
+
+            return res.json( { success:true, token: jwtToken.token });
+
         }
         return res.json(response)},
     register: async( req, res) => {
@@ -150,19 +143,23 @@ const process = {
         }
         return res.json(response)},
     startsinglegame : async( req, res)=>{
-            console.log( "process.startsinglegame : ", req.session.user_id );
-            const response = await UserStorage.startSingleGame( req.session.user_id );
-            req.session.isStartSingleGame = true;
+            console.log( "process.startsinglegame : ", req.userId );
+            const response = await UserStorage.startSingleGame( req.userId );
+            // todo : session -> jwt 로 세션에 저장하던 임시 정보를 별도로 처리 필요
+            // req.session.isStartSingleGame = true;
             return res.json(response);
         },
     endsinglegame : async(req,res)=>{
-        console.log( 'delete endsinglegame : ', req.session.user_id );
+        console.log( 'delete endsinglegame : ', req.userId );
 
         let response = { success:false};
-        if( req.session.isStartSingleGame ){
-            response = await UserStorage.addUserMoney( req.session.user_id, 100 );
-            req.session.isStartSingGame = false;
-        }
+        
+        console.log(req.isStartSingleGame);
+
+        // if( req.session.isStartSingleGame ){
+            response = await UserStorage.addUserMoney( req.userId, 100 );
+            // req.session.isStartSingGame = false;
+        // }
         return res.json( response );
     },
     

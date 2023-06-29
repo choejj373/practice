@@ -2,6 +2,7 @@
 
 const UserStorage = require("./userstorage");
 const crypto = require("crypto");
+const jwt = require('../modules/jwt');
 
 const createSalt = () => 
     new Promise(( resolve, reject) =>{
@@ -30,8 +31,10 @@ const makePasswordHashed = ( salt, plainPassword ) =>
     });
 
 class User{
+
     constructor(body){
         this.body = body;
+        this.userId = body.id;
     };
     
     async register(){
@@ -45,8 +48,10 @@ class User{
         const body = this.body;
 
         const userInfo = await UserStorage.getUserInfo( body.id );
-        // console.log( userInfo );
+        console.log( "UserInfo : ",userInfo );
         if( userInfo ){
+
+            const jwtToken = await jwt.sign( userInfo );
 
             const hashedPwd = await makePasswordHashed( userInfo.salt, body.psword );
             if( userInfo.id === this.body.id && userInfo.psword === hashedPwd){

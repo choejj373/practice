@@ -1,0 +1,9 @@
+// 유출되면 안되는 화일이니 product 일 경우 .gitignore필요
+module.exports = {
+    secretKey : "YoUrSeCrEtKeY",
+    option : {
+        algorithm : "HS256",
+        expiresIn : "30m",
+        issuer : "choejj"
+    }
+}

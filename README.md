@@ -13,6 +13,9 @@
         + mysql, memchached, redis, memory store 테스트 완료
         + http session 과 socket.io 연동
         
+    + jwt 적용
+        + 하나의 token만 사용하여 cookie에 저장해둠
+    
     + 채팅 
         + Websocket
         + 로그인된 클라이언트간 채팅
@@ -52,14 +55,25 @@
             + 매칭된 클라이언트가 모두 접속하면 게임이 시작되고 일정 시간이 지나면 게임 종료
         
 + 작업중
-    + 소스 정리 및 리펙토링
+
+    + linux( centOS),gcp
+        - node js 설치(+npm)
+        - git 설치
+            - github에서 소스 가져오기
+
+        - 최신 버젼들로 업데이트 : todo
+
     
     + 멀티 플레이 게임
         +간단한 서버 주도형 멀티 게임(pve)
 
 
 
+
 + TODO
+    + jwt
+        + access token 과 refresh token 분리
+
     + typescript
     
     + protobuf

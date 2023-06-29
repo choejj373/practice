@@ -4,7 +4,7 @@ const express = require("express");
 const dotenv = require ("dotenv");
 
 const cookieParser = require('cookie-parser');
-const session = require("express-session");
+const expressSession = require("express-session");
 
 
 dotenv.config();
@@ -29,6 +29,7 @@ const app = express();
 
 
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
 /**---------------------------------------------------------------*/
 // MemoryStore For Dev
 // app.use(
@@ -76,18 +77,18 @@ const options = {
     password: process.env.DB_PSWORD,
     database: process.env.DATABASE,
 
-    clearExpired: true,
-    checkExpirationInterval: minute,
-    expiration: hour,
+    // clearExpired: true,
+    // checkExpirationInterval: minute,
+    // expiration: hour,
 };
 
-const sessionStore = new MySqlStore( options );
+const sessionMySqlStore = new MySqlStore( options );
 
-app.use(
-    session({
+
+const sessionMiddleware = session({
         key: "session_cookie_name",
         secret: "session_cookie_secret",
-        store: sessionStore,
+        store: sessionMySqlStore,
         resave: false,
         saveUninitialized: false,
         rolling:true,
@@ -95,10 +96,10 @@ app.use(
             maxAge: minute * 5,
         }
     })
-);
 
- */
-
+*/
+ 
+/*
 const Redis = require('ioredis');
 const RedisStore = require('connect-redis').default;
 
@@ -124,8 +125,8 @@ const sessionMiddleware = session({
     },
     store: redisStore
 });
-
-app.use( sessionMiddleware );
+*/
+//app.use( sessionMiddleware );
 
 const home = require("./src/routes/home");
 
@@ -142,4 +143,4 @@ app.use('/', home);
 
  
 module.exports.app = app;
-module.exports.sessionMiddleware = sessionMiddleware;
+// module.exports.sessionMiddleware = sessionMiddleware;

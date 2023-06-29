@@ -1,28 +1,34 @@
 "use strict"
-const redis = require('redis');
+// caching 중지
+// const redis = require('redis');
 
-const redisClient = redis.createClient({
-    url: `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
-    legacyMode: true, // 반드시 설정 !!
- });
+// const redisClient = redis.createClient({
+//     url: `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
+//     legacyMode: true, // 반드시 설정 !!
+//  });
 
- //async/await이 잘 동작 되려면 꼭 필요
- const redisCli = redisClient.v4;
+//  //async/await이 잘 동작 되려면 꼭 필요
+//  const redisCli = redisClient.v4;
 
- redisClient.on('connect', () => {
-    console.info('Redis connected!');
- });
+//  redisClient.on('connect', () => {
+//     console.info('Redis connected!');
+//  });
 
- redisClient.on('error', (err) => {
-    console.error('Redis Client Error', err);
- });
+//  redisClient.on('error', (err) => {
+//     console.error('Redis Client Error', err);
+//  });
 
-redisClient.connect().then(); // redis v4 연결 (비동기)
-//  const redisCli = redisClient.v4; 
+// redisClient.connect().then(); // redis v4 연결 (비동기)
+
 
 class UserStorageCache{
     static async getItemAll( user_id){
+        
         let result = { success:false };
+
+        // caching 정지
+        return result;
+
         console.log(`${user_id}:item`)
         const ret = await redisCli.keys(`${user_id}:item`)
         if( ret <= 0 ){
@@ -62,6 +68,7 @@ class UserStorageCache{
     }
 
     static saveItemAll( user_id, items ){
+        return;// caching 중지
 
         items.forEach(element => {
             /*console.log( element );
@@ -72,6 +79,7 @@ class UserStorageCache{
     }
 
     static deleteItemAll( user_id){
+        return;// caching 중지
         redisCli.del( `${user_id}:item` );
     }
 }
