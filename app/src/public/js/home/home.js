@@ -17,8 +17,11 @@ const buyBeltBtn = document.getElementById("buyBelt");
 const buyShoesBtn = document.getElementById("buyShoes");
 
 const invenList = document.getElementById('inventory');
+const sellItemBtn = document.getElementById('sellItemBtn');
 
-// invenList.addEventListener("click", onClickedInven );
+sellItemBtn.addEventListener("click", promptInputItemId );
+
+
 buyWeaponBtn.addEventListener("click", ()=>buyItem(1) );
 buyNecklaceBtn.addEventListener("click", ()=>buyItem(2) );
 buyGloveBtn.addEventListener("click", ()=>buyItem(3) );
@@ -37,6 +40,32 @@ evolutionBtn.addEventListener("click", clearMainView );
 challengeBtn.addEventListener("click", clearMainView );
 
 freeGetBtn.addEventListener("click", getFreeDiamond );
+
+
+function promptInputItemId(){
+    console.log( "promptInputItemId");
+    const itemId = prompt("아이템 아이디를 입력해주세요");
+    console.log( itemId );
+
+    fetch("/equipment/inventory/", {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify( {
+            itemUid : parseInt( itemId ),       
+        } )
+    })
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+            showInven();
+        } else {
+            alert( res.msg );
+        }
+    })
+}
 
 function onClickedEquip( element ){
     console.log( "clicked : ", parseInt( element.target.innerText ));
@@ -205,7 +234,7 @@ function showStore(){
     // 골드로 사는 아이템
     // 다이아로 사는 아이템
 
-    fetch("/store/daily" )// GetUserStoreInfo
+    fetch("/store" )// GetUserStoreInfo
     .then((res) => res.json()) // json() promise
     .then((res) => {
         console.log( res );

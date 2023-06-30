@@ -185,9 +185,9 @@ class UserStorage{
         const conn = await dbPool.getConnection();
         let retVal = { success:false };
         try{
-            //owner == user_id 인지도 체크 필요
-            const sql1 = "DELETE FROM item_table WHERE item_uid = ?;";
-            const sql1s = mysql.format( sql1, item_uid );
+            const sql1 = "DELETE FROM item_table WHERE item_uid = ? AND owner = ?;";
+            const sql1a = [ item_uid, user_id ];
+            const sql1s = mysql.format( sql1, sql1a );
             console.log( sql1s );
 
             //over flow check
@@ -446,7 +446,7 @@ class UserStorage{
 
     static async startSingleGame( user_id ){
 
-        await updateBattleCoin( user_id );
+        await UserStorage.updateBattleCoin( user_id );
 
         const conn = await dbPool.getConnection();
         let retVal = { success:false };

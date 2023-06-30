@@ -109,8 +109,8 @@ const process = {
         return res.json(response);
     },
     sellItem: async(req,res)=>{
-        console.log( 'process.sellItem : ', req.body.item_uid );
-        const response = await UserStorage.sellItem( req.userId, req.body.item_uid );
+        console.log( 'process.sellItem : ', req.body.itemUid );
+        const response = await UserStorage.sellItem( req.userId, req.body.itemUid );
         if( response.success )
         {
             UserStorageCache.deleteItemAll(req.userId);
