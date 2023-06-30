@@ -9,6 +9,24 @@ const challengeBtn = document.getElementById("challenge");
 const evolutionBtn = document.getElementById("evolution");
 const freeGetBtn = document.getElementById("freeGetBtn");
 
+const buyWeaponBtn = document.getElementById("buyWeapon");
+const buyNecklaceBtn = document.getElementById("buyNecklace");
+const buyGloveBtn = document.getElementById("buyGlove");
+const buyArmorBtn = document.getElementById("buyArmor");
+const buyBeltBtn = document.getElementById("buyBelt");
+const buyShoesBtn = document.getElementById("buyShoes");
+
+
+
+buyWeaponBtn.addEventListener("click", ()=>buyItem(1) );
+buyNecklaceBtn.addEventListener("click", ()=>buyItem(2) );
+buyGloveBtn.addEventListener("click", ()=>buyItem(3) );
+buyArmorBtn.addEventListener("click", ()=>buyItem(4) );
+buyBeltBtn.addEventListener("click", ()=>buyItem(5) );
+buyShoesBtn.addEventListener("click", ()=>buyItem(6) );
+
+
+
 logoutBtn.addEventListener("click", logout );
 storeBtn.addEventListener("click", showStore );
 invenBtn.addEventListener("click", showInven );
@@ -19,15 +37,41 @@ challengeBtn.addEventListener("click", clearMainView );
 
 freeGetBtn.addEventListener("click", getFreeDiamond );
 
-function getFreeDiamond(){
+function buyItem( type )
+{
+    console.log( "buyItem : ", type )
 
-    fetch("/store", {
+    fetch("/store/diamond", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify( {
-            storeType: 1,    //일일 상점
+            type : 1,        //무료 다이아
+            itemType : type
+        } )
+    })
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+
+        } else {
+            alert( res.msg );
+        }
+    })
+
+}
+
+
+function getFreeDiamond(){
+
+    fetch("/store/daily", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify( {
             type : 1,        //무료 다이아
         } )
     })
@@ -76,7 +120,7 @@ function showStore(){
     // 골드로 사는 아이템
     // 다이아로 사는 아이템
 
-    fetch("/store" )// GetUserStoreInfo
+    fetch("/store/daily" )// GetUserStoreInfo
     .then((res) => res.json()) // json() promise
     .then((res) => {
         console.log( res );

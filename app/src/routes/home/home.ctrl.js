@@ -56,34 +56,39 @@ const output = {
 }
 
 const process = {
-    store: async(req,res)=>{
-        console.log( 'process.store : ', req.userId );
+    diamondstore: async( req, res)=>{
+        console.log( 'process.diamondstore : ', req.userId );
         console.log( req.body )        ;
-        // const body = JSON.parse( req.body );
+        
+        let response = await UserStorage.buyItemByDia( req.userId, req.body.itemType, 10 );
+
+        return res.json(response);
+    },
+    dailystore: async(req,res)=>{
+        console.log( 'process.dailystore : ', req.userId );
+        console.log( req.body )        ;
 
         let response = { success:false };
 
-        if( req.body.storeType === 1 )//일일 상점이라면
-        {
-            const result = await UserStorage.isSoldOutDailyStore( req.userId, req.body.type )
-            console.log( result );
+        const result = await UserStorage.isSoldOutDailyStore( req.userId, req.body.type )
+        console.log( result );
 
-            if( result.success ){
-                response.msg = result.msg;
-                return res.json(response);
-            }
-
-            switch( req.body.type )
-            {
-            case 1://무료 다이아
-                response = await UserStorage.getFreeDiamond( req.userId );
-                break;
-            case 2://골드 구입 아이템
-                break;
-            default://기타
-                break;
-            }
+        if( result.success ){
+            response.msg = result.msg;
+            return res.json(response);
         }
+
+        switch( req.body.type )
+        {
+        case 1://무료 다이아
+            response = await UserStorage.getFreeDiamond( req.userId );
+            break;
+        case 2://골드 구입 아이템
+            break;
+        default://기타
+            break;
+        }
+
         return res.json(response);
     },
     inventory_sell_item: async(req,res)=>{

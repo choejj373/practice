@@ -288,6 +288,45 @@ class UserStorage{
         }
         return retVal;
     };
+
+    static async buyItemByDia( user_id, itemType, price ){
+        const conn = await dbPool.getConnection();
+        let retVal = { success:false };
+        try{
+            const sql1 = "INSERT INTO item_table (item_index, owner) values (?,?);";
+            const sql1a = [itemType, user_id]
+            const sql1s = mysql.format( sql1, sql1a );
+            console.log( sql1s );
+
+            const sql2a = [price, user_id, price]
+            const sql2 = "UPDATE account SET diamond = diamond - ? WHERE id = ? AND diamond >= ?;";
+            const sql2s = mysql.format( sql2, sql2a );
+
+            console.log( sql2s );
+
+            await conn.beginTransaction();
+
+            const result = await conn.query( sql1s + sql2s );
+
+            console.log( result );
+
+            if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0 ) {
+                console.log( "commit");
+                await conn.commit();
+                retVal = {success:true};
+            }else{
+                console.log( "rollback : ");                            
+                await conn.rollback();
+            }
+        } catch( err ){
+            console.log( "rollback-", err );
+            await conn.rollback();
+        } finally{
+            console.log( "finally");
+            conn.release();
+        }
+        return retVal;
+    }
     // 뭔가 지저분 그냥 sp를 호출할까? 아님 money를 일단 가져올까?
     static async buyItem( user_id ){
 
