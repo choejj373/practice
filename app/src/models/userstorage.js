@@ -11,7 +11,8 @@ const dbPool = mysql.createPool({
     connectionLimit:10,
     multipleStatements: true,
     keepAliveInitialDelay: 10000, // 0 by default.
-    enableKeepAlive: true, // false by default    
+    enableKeepAlive: true, // false by default  
+    dateStrings: 'date'  
 });
 
 dbPool.on('release', () =>{
@@ -41,6 +42,73 @@ class UserStorage{
             });
         });
     }
+    // 5분마다 1씩 충전되는 battleCoin에 대한 처리 : 유저 정보를 가져가거나 사용전 호출 필요
+    static async updateBattleCoin( user_id ){
+        const conn = await dbPool.getConnection();
+
+        try{
+            const [row] = await conn.query("SELECT battle_coin, update_time FROM account WHERE id = ?;", [user_id] );
+            console.log( row );
+            
+            if( Array.isArray(row) && row.length === 0 ) {
+                console.log("not found : ", user_id );
+            }else{
+    
+                const maxBattleCoin = 100;
+    
+                const nowDateUTC = new Date();//.now().getTime();
+                const updateDateUTC = new Date( row[0].update_time );
+    
+                console.log( nowDateUTC );
+                console.log( updateDateUTC );
+    
+                const nowTimeUTC = nowDateUTC.getTime();
+                const updateTimeUTC = updateDateUTC.getTime();
+                const elapsedTime = nowTimeUTC - updateTimeUTC;
+                
+                console.log( nowTimeUTC );
+                console.log( updateTimeUTC );
+                console.log( elapsedTime );
+                
+                const elapsedCount  = parseInt( elapsedTime / ( 1000 * 60 * 5 ) );//5분마다 1번
+    
+                console.log( "elapsedCount : ", elapsedCount);
+    
+                if( row[0].battle_coin < maxBattleCoin )
+                {
+                    if( elapsedCount > 0 )
+                    {
+                        const newBattleCoin = row[0].battle_coin + elapsedCount;
+    
+                        if( newBattleCoin > maxBattleCoin ){ newBattleCoin = maxBattleCoin;}
+                        console.log( "new battle coin : ", newBattleCoin );
+    
+                        const result1 = await conn.query("UPDATE account SET battle_coin = ?, update_time = DATE_ADD( update_time, INTERVAL ? MINUTE) WHERE id = ?",
+                                            [ newBattleCoin, elapsedCount  * 5, user_id ]);
+    
+                        console.log( result1 );
+                    }
+                    else
+                    {
+                        console.log("time is not enough");
+                    }
+                }
+                else
+                {
+                    console.log("battle coin is full : ", row[0].battle_coin );
+
+                    const result1 = await conn.query("UPDATE account SET update_time = ? WHERE id = ?",
+                                [ new Date(), user_id ]);
+    
+                    console.log( result1 );
+                }
+            }
+        }catch( err ){
+            console.log( err );
+        }finally{
+            conn.release();
+        }        
+    }
 
     static async getTradeDailyStore( user_id ){
         const conn = await dbPool.getConnection();
@@ -53,12 +121,14 @@ class UserStorage{
         }catch( err ){
             console.log( err );
         }finally{
-            await conn.release();
+            conn.release();
         }
         return retVal;
     }
 
     static async getUserInfo(id){
+
+        await UserStorage.updateBattleCoin( id );
 
         const conn = await dbPool.getConnection();
         let retVal;
@@ -69,7 +139,7 @@ class UserStorage{
         }catch( err ){
             console.log( err );
         }finally{
-            await conn.release();
+            conn.release();
         }
         return retVal;
     }
@@ -89,7 +159,7 @@ class UserStorage{
             // await conn.rollback();
             retVal = {success:false};
         }finally{
-            await conn.release();
+            conn.release();
         }
 
         return retVal;
@@ -107,7 +177,7 @@ class UserStorage{
         {
             console.log(err);
         }finally{
-            await conn.release();
+            conn.release();
         }
         return retVal;
     };
@@ -145,7 +215,7 @@ class UserStorage{
             await conn.rollback();
         } finally{
             console.log( "finally");
-            await conn.release();
+            conn.release();
         }
         return retVal;
     };
@@ -171,7 +241,7 @@ class UserStorage{
             console.log( err );
         } finally{
             console.log( "finally");
-            await conn.release();
+            conn.release();
         }
         return retVal;
     }
@@ -214,7 +284,7 @@ class UserStorage{
             await conn.rollback();
         } finally{
             console.log( "finally");
-            await conn.release();
+            conn.release();
         }
         return retVal;
     };
@@ -254,13 +324,15 @@ class UserStorage{
             await conn.rollback();
         } finally{
             console.log( "finally");
-            await conn.release();
+            conn.release();
         }
         return retVal;
     };
 
-    // underflow 체크 필요
     static async startSingleGame( user_id ){
+
+        await updateBattleCoin( user_id );
+
         const conn = await dbPool.getConnection();
         let retVal = { success:false };
         try{        
@@ -272,7 +344,7 @@ class UserStorage{
         }catch( err ){
             console.error( err );
         }finally{
-            await conn.release();
+            conn.release();
         }
         return retVal;
     };
@@ -291,7 +363,7 @@ class UserStorage{
         }catch( err ){
             console.error( err );
         }finally{
-            await conn.release();
+            conn.release();
         }
         return retVal;
     };
