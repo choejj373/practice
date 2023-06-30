@@ -3,7 +3,7 @@ module.exports = {
     secretKey : "YoUrSeCrEtKeY",
     options : {
         algorithm : "HS256",
-        expiresIn : "30m",
+        expiresIn : "1h",
         issuer : "choejj"
     }
 }

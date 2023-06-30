@@ -78,7 +78,7 @@ class UserStorage{
                 {
                     if( elapsedCount > 0 )
                     {
-                        const newBattleCoin = row[0].battle_coin + elapsedCount;
+                        let newBattleCoin = row[0].battle_coin + elapsedCount;
     
                         if( newBattleCoin > maxBattleCoin ){ newBattleCoin = maxBattleCoin;}
                         console.log( "new battle coin : ", newBattleCoin );
@@ -288,6 +288,82 @@ class UserStorage{
         }
         return retVal;
     };
+
+    static async unEquipItemSameType( userId, itemId )
+    {
+        console.log( "unEquipItemSameType : ", userId," ", itemId)
+        const conn = await dbPool.getConnection();
+        try{        
+            let [row1] = await conn.query("SELECT item_index FROM item_table WHERE item_uid = ? ;", [itemId] );
+
+            console.log( row1 );
+
+            if( Array.isArray( row1 ) && row1.length > 0 )
+            {
+                console.log( row1[0].item_index) ;
+                // TODO : item_uid != itemId를 하지 않으면 이어서 실행될 equpItem이 제대로 동작하지 않는다.
+                // equipItem이후 처리가 되는게 아닐까?????
+                const [row2] = await conn.query("UPDATE item_table SET equip = 0 WHERE owner = ? AND item_index = ? AND item_uid != ?;", 
+                             [userId, row1[0].item_index, itemId] );
+
+                console.log( row2 );
+            }
+            else{
+                console.log("not found");
+            }
+
+        }catch( err ){
+            console.error( err );
+        }finally{
+            await conn.release();
+        }
+    }
+
+    static async equipItem( userId, itemId )
+    {
+        // TODO : 중복 장착 체크 추가 필요
+        this.unEquipItemSameType( userId, itemId );
+        // 테이블 구조를 바꿀지 INDEX를 추가 할지 선택 필요 => 인덱스 추가
+        // 현재 있는 item_index 를 item_type으로 사용하자 일단;
+        const conn = await dbPool.getConnection();
+        let retVal = { success:false };
+        try{        
+            const [result] = await conn.query("UPDATE item_table SET equip = 1 WHERE item_uid = ? AND owner = ? ;", 
+                        [itemId, userId] );
+
+            console.log( result );
+
+            if( result.changedRows > 0 ){
+                retVal =  {success:true};
+            };
+        }catch( err ){
+            console.error( err );
+        }finally{
+            conn.release();
+        }
+        return retVal;
+    }
+
+    static async unEquipItem( userId, itemId )
+    {
+        const conn = await dbPool.getConnection();
+        let retVal = { success:false };
+        try{        
+            const [result] = await conn.query("UPDATE item_table SET equip = 0 WHERE item_uid = ? AND owner = ? ;", 
+                        [itemId, userId] );
+
+            console.log( result );
+
+            if( result.changedRows > 0 ){
+                retVal =  {success:true};
+            };
+        }catch( err ){
+            console.error( err );
+        }finally{
+            conn.release();
+        }
+        return retVal;
+    }
 
     static async buyItemByDia( user_id, itemType, price ){
         const conn = await dbPool.getConnection();

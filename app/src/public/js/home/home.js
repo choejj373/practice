@@ -16,8 +16,9 @@ const buyArmorBtn = document.getElementById("buyArmor");
 const buyBeltBtn = document.getElementById("buyBelt");
 const buyShoesBtn = document.getElementById("buyShoes");
 
+const invenList = document.getElementById('inventory');
 
-
+// invenList.addEventListener("click", onClickedInven );
 buyWeaponBtn.addEventListener("click", ()=>buyItem(1) );
 buyNecklaceBtn.addEventListener("click", ()=>buyItem(2) );
 buyGloveBtn.addEventListener("click", ()=>buyItem(3) );
@@ -36,6 +37,50 @@ evolutionBtn.addEventListener("click", clearMainView );
 challengeBtn.addEventListener("click", clearMainView );
 
 freeGetBtn.addEventListener("click", getFreeDiamond );
+
+function onClickedEquip( element ){
+    console.log( "clicked : ", parseInt( element.target.innerText ));
+    fetch("/equipment/equip", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify( {
+            itemUid : parseInt( element.target.innerText ),       
+        } )
+    })
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+            showInven();
+        } else {
+            alert( res.msg );
+        }
+    })
+}
+
+function onClickedInven( element ){
+    console.log( "clicked : ", parseInt( element.target.innerText ));
+    fetch("/equipment/inventory", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify( {
+            itemUid : parseInt( element.target.innerText ),       
+        } )
+    })
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+            showInven();
+        } else {
+            alert( res.msg );
+        }
+    })
+}
 
 function buyItem( type )
 {
@@ -110,6 +155,46 @@ function showCombat(){
 function showInven()
 {
     clearMainView();   
+ 
+    fetch("/equipment" )// GetUserStoreInfo
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+            const inven = document.querySelector('#inventory');
+            const equip = document.querySelector('#equip');
+
+            inven.replaceChildren();
+            equip.replaceChildren();
+
+            res.items.forEach(element => {
+
+                if( element.equip )
+                {
+                    let messageItem = document.createElement('li');
+                    messageItem.textContent = `${element.item_uid}`;
+
+                    messageItem.addEventListener("click", function(messageItem){
+                        onClickedEquip(messageItem)} );
+
+                    equip.appendChild(messageItem);
+
+                }
+                else{
+                    let messageItem = document.createElement('li');
+                    messageItem.textContent = `${element.item_uid}`;
+
+                    messageItem.addEventListener("click", function(messageItem){
+                        onClickedInven(messageItem)} );
+
+                    inven.appendChild(messageItem);
+                }
+            });
+        } else {
+            alert( res.msg );
+        }
+    })
+ 
     const element = document.getElementById("mainInven");
     element.style.display = '' ;
 }

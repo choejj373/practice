@@ -24,8 +24,8 @@ router.post("/login", ctrl.process.login );
 
 router.post("/register", ctrl.process.register );
 
-router.post("/inventory/get-all", authUtil.checkToken,ctrl.process.inventory_get_all );
-router.post("/inventory/sell-item", authUtil.checkToken,ctrl.process.inventory_sell_item );
+// router.post("/inventory/get-all", authUtil.checkToken,ctrl.process.inventory_get_all );
+// router.post("/inventory/sell-item", authUtil.checkToken,ctrl.process.inventory_sell_item );
 
 router.post("/singlegame", authUtil.checkToken,ctrl.process.startsinglegame);
 router.delete("/singlegame", authUtil.checkToken,ctrl.process.endsinglegame );
@@ -37,4 +37,8 @@ router.get("/store/daily", authUtil.checkToken,ctrl.process.getTradeDailyStore);
 router.post("/store/daily", authUtil.checkToken,ctrl.process.dailystore);
 router.post("/store/diamond", authUtil.checkToken,ctrl.process.diamondstore);
 
+router.get("/equipment", authUtil.checkToken,ctrl.process.getItemAll );
+router.put("/equipment/inventory", authUtil.checkToken,ctrl.process.equipItem );
+router.put("/equipment/equip", authUtil.checkToken,ctrl.process.unEquipItem );
+router.delete("/equipment/inventory/:id", authUtil.checkToken,ctrl.process.sellItem );
 module.exports = router;   

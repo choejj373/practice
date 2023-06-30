@@ -56,6 +56,23 @@ const output = {
 }
 
 const process = {
+    equipItem : async( req, res)=>{
+        console.log( 'process.equipItem : ', req.userId );
+        console.log( req.body )        ;
+
+        let response = await UserStorage.equipItem( req.userId, req.body.itemUid );
+
+        return res.json(response);
+    },
+    unEquipItem : async( req, res)=>{
+        console.log( 'process.equipItem : ', req.userId );
+        console.log( req.body )        ;
+
+        let response = await UserStorage.unEquipItem( req.userId, req.body.itemUid );
+
+        return res.json(response);
+    },
+
     diamondstore: async( req, res)=>{
         console.log( 'process.diamondstore : ', req.userId );
         console.log( req.body )        ;
@@ -91,8 +108,8 @@ const process = {
 
         return res.json(response);
     },
-    inventory_sell_item: async(req,res)=>{
-        console.log( 'process.inventory_sell_item : ', req.body.item_uid );
+    sellItem: async(req,res)=>{
+        console.log( 'process.sellItem : ', req.body.item_uid );
         const response = await UserStorage.sellItem( req.userId, req.body.item_uid );
         if( response.success )
         {
@@ -100,8 +117,8 @@ const process = {
         }
         return res.json(response);
     },
-    inventory_get_all: async(req,res)=>{
-        console.log( 'process.inventory_get_all : ', req.userId );
+    getItemAll: async(req,res)=>{
+        console.log( 'process.getItemAll : ', req.userId );
 
         let response;
         response = await UserStorageCache.getItemAll( req.userId )
