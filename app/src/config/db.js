@@ -17,7 +17,7 @@ const dbPool = mysql.createPool({
 });
 
 dbPool.on('release', () =>{
-    console.log("db pool conn is released");
+    // console.log("db pool conn is released");
 })
 
 module.exports = { dbPool, mysql };

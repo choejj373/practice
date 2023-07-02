@@ -85,8 +85,11 @@ function showDailyQuestList(){
 
             res.quests.forEach((element)=>{
                 let item = document.createElement('li');
-                item.textContent = `ID:${element.id} TYPE:${element.quest_type} EXPIRED:${element.expire_date}`;
+                item.textContent = `ID:${element.id}, QUESTIDX:${element.quest_index}, VALUE:${element.value}, Completed:${element.complete}, EXPIRED:${element.expire_date}`;
                 
+                item.addEventListener("click", function(item){
+                    onClickedQuest(item)} );
+
                 questList.appendChild( item);
             })
 
@@ -108,7 +111,10 @@ function showWeeklyQuestList(){
 
             res.quests.forEach((element)=>{
                 let item = document.createElement('li');
-                item.textContent = `ID:${element.id} TYPE:${element.quest_type} EXPIRED:${element.expire_date}`;
+                item.textContent = `ID:${element.id}, QUESTIDX:${element.quest_index}, VALUE:${element.value}, Completed:${element.complete}, EXPIRED:${element.expire_date}`;
+
+                item.addEventListener("click", function(item){
+                    onClickedQuest(item)} );
                 
                 questList.appendChild( item);
             })
@@ -131,7 +137,10 @@ function showNormalQuestList(){
 
             res.quests.forEach((element)=>{
                 let item = document.createElement('li');
-                item.textContent = `ID:${element.id} TYPE:${element.quest_type} EXPIRED:${element.expire_date}`;
+                item.textContent = `ID:${element.id}, QUESTIDX:${element.quest_index}, VALUE:${element.value}, Completed:${element.complete}, EXPIRED:${element.expire_date}`;
+
+                item.addEventListener("click", function(item){
+                    onClickedQuest(item)} );
                 
                 questList.appendChild( item);
             })
@@ -221,6 +230,41 @@ function onClickedEquip( element ){
         console.log( res );
         if( res.success ){
             showInven();
+        } else {
+            alert( res.msg );
+        }
+    })
+}
+function onClickedQuest( element){
+    console.log( "clicked : ", element.target.innerText );
+
+    const str = element.target.innerText;
+    
+    const posQuestId = str.indexOf(":") + 1;
+    const endposQuestId = str.indexOf(",", posQuestId );
+    const questId = str.substr( posQuestId, endposQuestId - posQuestId );
+    console.log( questId );
+
+    const posQuestIndex = str.indexOf(":", endposQuestId ) + 1;
+    const endposQuestIndex = str.indexOf(",", posQuestIndex );
+    const questIndex = str.substr( posQuestIndex, endposQuestIndex - posQuestIndex );
+    console.log( questIndex );
+
+    fetch("/quest/reward", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify( {
+            questId : parseInt( questId ),       
+            questIndex : parseInt( questIndex ) 
+        } )
+    })
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+            // showInven();
         } else {
             alert( res.msg );
         }

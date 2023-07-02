@@ -42,20 +42,20 @@ class UserStorage{
                 const nowDateUTC = new Date();//.now().getTime();
                 const updateDateUTC = new Date( row[0].update_time );
     
-                console.log( nowDateUTC );
-                console.log( updateDateUTC );
+                // console.log( nowDateUTC );
+                // console.log( updateDateUTC );
     
                 const nowTimeUTC = nowDateUTC.getTime();
                 const updateTimeUTC = updateDateUTC.getTime();
                 const elapsedTime = nowTimeUTC - updateTimeUTC;
                 
-                console.log( nowTimeUTC );
-                console.log( updateTimeUTC );
-                console.log( elapsedTime );
+                // console.log( nowTimeUTC );
+                // console.log( updateTimeUTC );
+                // console.log( elapsedTime );
                 
                 const elapsedCount  = parseInt( elapsedTime / ( 1000 * 60 * 5 ) );//5분마다 1번
     
-                console.log( "elapsedCount : ", elapsedCount);
+                // console.log( "elapsedCount : ", elapsedCount);
     
                 if( row[0].battle_coin < maxBattleCoin )
                 {
@@ -69,7 +69,7 @@ class UserStorage{
                         const result1 = await conn.query("UPDATE account SET battle_coin = ?, update_time = DATE_ADD( update_time, INTERVAL ? MINUTE) WHERE id = ?",
                                             [ newBattleCoin, elapsedCount  * 5, user_id ]);
     
-                        console.log( result1 );
+                        // console.log( result1 );
                     }
                     else
                     {
@@ -83,7 +83,7 @@ class UserStorage{
                     const result1 = await conn.query("UPDATE account SET update_time = ? WHERE id = ?",
                                 [ new Date(), user_id ]);
     
-                    console.log( result1 );
+                    // console.log( result1 );
                 }
             }
         }catch( err ){

@@ -11,10 +11,8 @@ quest_type  = quest_list.type not null
 owner = account.id : secondary key not null
 value : DEFAULT 0   not null
 
-expired_date : NULL
-
-reward_receipt : DEFAULT 0 not null - 보상을 수령했는가?
---> complete : todo 변경
+expire_date : NULL
+complete : 보상 까지 받아서 완료 되었는지 체크
 */
 
 /*
@@ -24,8 +22,8 @@ type    // 일일/주간/업적 not null int
 reward_type default 0 
 reward_Value default 0 
 
-fulfill_type default 0  //달성 타입 : todo 추가
-fulfill_value default 0 //달성 값   : todo 추가
+fulfill_type default 0  
+fulfill_value default 0 
 */
 
 
@@ -50,6 +48,65 @@ class QuestStorage
             conn.release();
         }
         return retVal;
+    }
+
+    //퀘스트 완료 조건 체크하여 Diamond 지급
+    //체크 조건이 좀 많은것 같은데 줄일 방법이 있을까?
+    // id로 한번에 찾기 때문에 속도 문제는 없을것 같아.
+    async rewardDiamond( userId, questId, questIndex, fulfillValue, rewardValue )
+    {
+        const conn = await dbPool.getConnection();
+        let retVal = { success:false };
+        try{
+            const sql1 = "UPDATE user_quest SET complete = 1 WHERE  id = ? AND complete = 0 AND owner = ? AND quest_index = ? AND value >= ?;";
+            const sql1a = [ questId, userId, questIndex, fulfillValue ];
+            const sql1s = mysql.format( sql1, sql1a );
+            console.log( sql1s );
+
+            const sql2a = [ rewardValue, userId ];
+            const sql2 = "UPDATE account SET diamond = diamond + ? WHERE id = ?;";
+            const sql2s = mysql.format( sql2, sql2a);
+
+            console.log( sql2s );
+
+            await conn.beginTransaction();
+
+            const result = await conn.query( sql1s + sql2s );
+
+            if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0 ) {
+                console.log( "commit");
+                await conn.commit();
+                retVal = {success:true};
+            }else{
+                console.log( "rollback");                            
+                await conn.rollback();
+                retVal = {success:false, msg:"db query failed"};
+            }
+        } catch( err ){
+            console.log( "rollback-", err );
+            retVal = {success:false, msg:"db query error"};
+            await conn.rollback();
+        } finally{
+            console.log( "finally");
+            conn.release();
+        }
+        return retVal;
+    }
+
+    async addUserQuestValue( userId, questIndex, addValue ){
+
+        const conn = await dbPool.getConnection();
+
+        try{
+            await conn.query("UPDATE user_quest SET value = value + ? WHERE owner = ? AND quest_index=?;", 
+                    [addValue, userId, questIndex] );
+
+        }catch(err)
+        {
+            console.log(err);
+        }finally{
+            conn.release();
+        }
     }
 
     async getUserQuestInfo( userId, questType ){
@@ -89,29 +146,29 @@ class QuestStorage
     //     return retVal;
     // }
 
-    async addUserQuestValue( questId, userId, addValue )
-    {
-        const conn = await dbPool.getConnection();        
-        let retVal = { success: false };
+    // async addUserQuestValue( questId, userId, addValue )
+    // {
+    //     const conn = await dbPool.getConnection();        
+    //     let retVal = { success: false };
         
 
 
-        try{
-            const [result] = await conn.query("UPDATE user_quest SET value = value + ? WHERE id = ? AND owner = ?;", 
-                            addValue, questId, userId );
+    //     try{
+    //         const [result] = await conn.query("UPDATE user_quest SET value = value + ? WHERE id = ? AND owner = ?;", 
+    //                         addValue, questId, userId );
 
-            if( result.affectedRows > 0){
-                retVal.success = true;
-            }
+    //         if( result.affectedRows > 0){
+    //             retVal.success = true;
+    //         }
 
-        }catch(err)
-        {
-            console.log(err);
-        }finally{
-            conn.release();
-        }
-        return retVal;
-    }
+    //     }catch(err)
+    //     {
+    //         console.log(err);
+    //     }finally{
+    //         conn.release();
+    //     }
+    //     return retVal;
+    // }
 
     // 만료된 일일/주간 퀘스트 RESET
     async resetRepeatQuestInfo( questId, userId, expireDate )
@@ -121,7 +178,7 @@ class QuestStorage
         let retVal = { success: false };
 
         try{
-            const [result1] = await conn.query("UPDATE user_quest SET value = 0, reward_receipt = 0, expire_date = ? WHERE id = ? AND owner = ?;", 
+            const [result1] = await conn.query("UPDATE user_quest SET value = 0, complete = 0, expire_date = ? WHERE id = ? AND owner = ?;", 
                         [ expireDate, questId, userId ] );
 
             retVal.success = true;

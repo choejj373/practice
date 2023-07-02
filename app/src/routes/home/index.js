@@ -47,4 +47,5 @@ router.put("/equipment/equip", authUtil.checkToken,ctrl.process.unEquipItem );
 router.get("/quest/daily", authUtil.checkToken,ctrl.process.getUserDailyQuestInfo );
 router.get("/quest/weekly", authUtil.checkToken,ctrl.process.getUserWeeklyQuestInfo );
 router.get("/quest/normal", authUtil.checkToken,ctrl.process.getUserNormalQuestInfo );
+router.put("/quest/reward", authUtil.checkToken,ctrl.process.requireQuestReward );
 module.exports = router;   

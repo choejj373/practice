@@ -28,10 +28,6 @@ const output = {
         
         console.log("output.home userId:", req.userId);
 
-        const userInfo = await UserStorage.getUserInfo( req.userId );
-
-        console.log( userInfo );
-
         res.render("home/index")
     },
 
@@ -57,6 +53,11 @@ const output = {
 }
 
 const process = {
+    requireQuestReward : async ( req, res)=>{
+        console.log( 'process.requireQuestReward : ', req.userId );
+        const response = await Quest.rewardQuestReward( req.userId, req.body.questId, req.body.questIndex );
+        return res.json( response );
+    },
     getUserNormalQuestInfo : async( req, res)=>{
         console.log( 'process.getUserNormalQuestInfo : ', req.userId );
         const response = await Quest.getUserNormalQuestInfo( req.userId );
@@ -156,9 +157,10 @@ const process = {
     },
     login: async(req, res) => { 
         console.log( "process.login" );
+
         const user = new User( req.body );
         const response = await user.login();
-        console.log( response );
+
         if( response.success )
         {
             const jwtToken = await jwt.sign( user.userId );
@@ -172,6 +174,7 @@ const process = {
 
             res.cookie( 'token', jwtToken.token, cookieOption );
 
+            Quest.processLogin( user.userId );
 
             return res.json( { success:true, token: jwtToken.token });
 
@@ -220,8 +223,6 @@ const process = {
         console.log("get process.home userId:", req.userId);
 
         const userInfo = await UserStorage.getUserInfo( req.userId );
-
-        console.log( userInfo );
 
         if( userInfo ){
             return res.json( {success:true, 

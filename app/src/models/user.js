@@ -57,10 +57,8 @@ class User{
         const body = this.body;
 
         const userInfo = await UserStorage.getUserInfo( body.id );
-        console.log( "UserInfo : ",userInfo );
+
         if( userInfo ){
-
-
             const hashedPwd = await makePasswordHashed( userInfo.salt, body.psword );
             if( userInfo.id === this.body.id && userInfo.psword === hashedPwd){
 

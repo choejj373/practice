@@ -12,6 +12,9 @@ const moment = require('moment');
 // 4. 퀘스트별로 UPDATE가 필요한 부분은 이 모듈을 통해서  처리한다.( 매일 로그인, 몬스터 처치, 보스 처치 등등 )
 // 5. 보상 부여도 여기서
 
+// enum
+// fulfill type : 1 - 로그인, 
+// reward type : 1 - 다이아몬드
 class Quest{
 
 // 여기서 userquestinfo를 가져온다.
@@ -20,18 +23,77 @@ class Quest{
         QuestStorage.loadQuestList()
         .then((result)=>{
             this.questList = result.quests;
+            console.log( this.questList );
         })
         .catch(console.log)
     }
 
     // questList를 기반하여 모든 퀘스트를 user_quest Table에 넣어둔다.
+    // TODO : 중간에 추가된 퀘스트에 대한 처리가 필요하다.
     createUserQuestAll( userId )
     {
         console.log( "Quest.createUserQuestAll");
         QuestStorage.createUserQuestAll( userId, this.questList );
     }
 
+    getQuestIndexByFulfill( fulfillType )
+    {
+        let result = [];
+        this.questList.forEach((quest)=>{
+            if( quest.fulfill_type == fulfillType ){
+                result.push( quest.id );
+            }
+        });
+        return result;
+    }
+
+    getRewardInfo( questIndex ){
+        let result = { 
+            rewardType : 0,
+            rewardValue : 0,
+            fulfill_value : 0
+        }
+
+        this.questList.forEach((quest)=>{
+            if( quest.id == questIndex ){
+                result.rewardType = quest.reward_type;
+                result.rewardValue = quest.reward_value;
+                result.fulfill_value = quest.fulfill_value;
+            }
+        });
+
+        return result;
+    }
+
+    async rewardQuestReward( userId, questId, questIndex ){
+        const result = this.getRewardInfo( questIndex );
+        let response = { success:false, msg:"Error" };
+
+        if( result.rewardType == 0){
+            return { success:false, msg:"Not Found Reward" }
+        }
+
+        // DB에 userId, questId, questIndex, value >= fulfill_value , complete = 0 으로 체크하여
+        // set complete = 1 && 보상 지급
+        if( result.rewardType == 1)// 다이아몬드
+        {
+            response = QuestStorage.rewardDiamond( userId, questId, questIndex, result.fulfill_value, result.rewardValue );
+        }
+        return response;
+    }
+
+    //로그인시에 퀘스트에서 처리할것들
+    processLogin( userId ){
+
+        const questIndexList = this.getQuestIndexByFulfill( 1 );
+        // console.log( questIndexList );
+        questIndexList.forEach( (questIndex)=>{
+            // console.log( questIndex );
+            QuestStorage.addUserQuestValue( userId, questIndex, 1 );
+        });
+    }
     
+
     async getUserNormalQuestInfo( userId ){
         console.log("Quest.getUserNormalQuestInfo : ", userId );
         return await QuestStorage.getUserQuestInfo( userId, 0 );
@@ -67,7 +129,7 @@ class Quest{
                 
                 element.value = 0;
                 element.expire_date = moment(newWeeklyExpireDate).tz('Asia/Seoul').format();;
-                element.reward_receipt = 0;
+                element.complete = 0;
 
                 QuestStorage.resetRepeatQuestInfo( element.id, userId, newWeeklyExpireDate )
             }
@@ -97,7 +159,7 @@ class Quest{
                 
                 element.value = 0;
                 element.expire_date = moment(newDailyExpireDate).tz('Asia/Seoul').format();
-                element.reward_receipt = 0;
+                element.complete = 0;
 
                 QuestStorage.resetRepeatQuestInfo( element.id, userId, newDailyExpireDate )
             }
