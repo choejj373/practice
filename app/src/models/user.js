@@ -1,6 +1,8 @@
 "use strict"
 
 const UserStorage = require("./userstorage");
+const Quest = require("../services/quest");
+
 const crypto = require("crypto");
 
 
@@ -38,10 +40,17 @@ class User{
     };
     
     async register(){
+        console.log( "User.register");
+
         const client = this.body;
         const { password, salt } = await createHashedPassword( client.psword);
-        console.log( password );
-        return UserStorage.save( client, password, salt );
+        // console.log( password );
+        const result = await UserStorage.save( client, password, salt );
+        console.log( result );
+        if( result.success){
+            Quest.createUserQuestAll( this.userId );
+        }
+        return result;
     };
 
     async login(){

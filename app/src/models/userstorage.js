@@ -1,46 +1,29 @@
-"user strict";
+"use strict";
 
-const mysql = require('mysql2/promise');
-
-//const getConnection = require("../config/db");
-const dbPool = mysql.createPool({
-    host:process.env.DB_HOST,
-    user:process.env.DB_USER,
-    password:process.env.DB_PSWORD,
-    database:process.env.DB_DATABASE,
-    connectionLimit:10,
-    multipleStatements: true,
-    keepAliveInitialDelay: 10000, // 0 by default.
-    enableKeepAlive: true, // false by default  
-    dateStrings: 'date'  
-});
-
-dbPool.on('release', () =>{
-    console.log("db pool conn is released");
-})
+const { dbPool, mysql }  = require("../config/db");
 
 //use function for mysql module
-function getConnection(callback){
-    dbPool.getConnection( function(err, conn ){
-        if(!err){
-            callback(conn);
-        }
-    });
-}
+// function getConnection(callback){
+//     dbPool.getConnection( function(err, conn ){
+//         if(!err){
+//             callback(conn);
+//         }
+//     });
+// }
 
 class UserStorage{
 
     static test()
     {
-        return new Promise( (resolve, reject) =>{
-            getConnection( (conn) =>{
-                conn.query("call testProc3(?);", "choejj", ( err ) =>{
-                    if(err) reject (`${err}`);
-                    resolve();
-                });
-                conn.release();
-            });
-        });
+        // return new Promise( (resolve, reject) =>{
+        //     getConnection( (conn) =>{
+        //         conn.query("call testProc3(?);", "choejj", ( err ) =>{
+        //             if(err) reject (`${err}`);
+        //             resolve();
+        //         });
+        //         conn.release();
+        //     });
+        // });
     }
     // 5분마다 1씩 충전되는 battleCoin에 대한 처리 : 유저 정보를 가져가거나 사용전 호출 필요
     static async updateBattleCoin( user_id ){
@@ -110,13 +93,27 @@ class UserStorage{
         }        
     }
 
+    static async deleteTradeDailyStore( userId, tradeId )
+    {
+        const conn = await dbPool.getConnection();
+
+        try{
+            conn.query("delete from trade_daily_store where id = ? AND owner = ?;", 
+                        [ tradeId, userId] );
+
+        }catch( err ){
+            console.log( err );
+        }finally{
+            conn.release();
+        }
+    }
     static async getTradeDailyStore( user_id ){
         const conn = await dbPool.getConnection();
         let retVal = [];
 
         try{
-            const [row] = await conn.query("select * from trade_daily_store where user_id = ?;", [user_id] );
-            console.log( row );
+            const [row] = await conn.query("select * from trade_daily_store where owner = ?;", [user_id] );
+
             retVal = row;
         }catch( err ){
             console.log( err );
@@ -145,6 +142,9 @@ class UserStorage{
     }
 
     static async save( userInfo ,hashedpassword, salt ){
+        
+        console.log( "UserStorage.save");
+
         const conn = await dbPool.getConnection();
         let retVal;
         try{
@@ -225,14 +225,12 @@ class UserStorage{
         let retVal = { success:true , msg:'sold out'};
         
         try{
-            const sql1 = "SELECT * FROM trade_daily_store WHERE user_id = ? and type = ?";
+            const sql1 = "SELECT * FROM trade_daily_store WHERE owner = ? and type = ?";
             const sql1a = [user_id, type]
             const sql1s = mysql.format( sql1, sql1a );
             console.log( sql1s );
 
             const [row] = await conn.query( sql1s );
-
-            console.log( row );
 
             if( Array.isArray(row) && row.length === 0 ) {
                 retVal = {success:false};
@@ -247,14 +245,20 @@ class UserStorage{
     }
 
     static async getFreeDiamond( user_id ){
-
         const conn = await dbPool.getConnection();
         let retVal = { success:false };
 
         try{
+
+    
+            const nowDate = new Date();
+            const expireDate = new Date( nowDate.setHours( 24,0,0,0 ) );
+
+            console.log( expireDate );
+
             const freeDiamond = 100;
-            const sql1 = "INSERT INTO trade_daily_store (user_id, type, value) values (?,?,?);";
-            const sql1a = [user_id, 1, freeDiamond]
+            const sql1 = "INSERT INTO trade_daily_store (owner, type, value, expire_time ) values (?,?,?,?);";
+            const sql1a = [user_id, 1, freeDiamond, expireDate ]
             const sql1s = mysql.format( sql1, sql1a );
             console.log( sql1s );
 
@@ -268,8 +272,6 @@ class UserStorage{
             await conn.beginTransaction();
 
             const result = await conn.query( sql1s + sql2s );
-
-            console.log( result );
 
             if( result[0][0].affectedRows > 0 && result[0][1].changedRows > 0 ) {
                 console.log( "commit");
@@ -296,8 +298,6 @@ class UserStorage{
         try{        
             let [row1] = await conn.query("SELECT item_index FROM item_table WHERE item_uid = ? ;", [itemId] );
 
-            console.log( row1 );
-
             if( Array.isArray( row1 ) && row1.length > 0 )
             {
                 console.log( row1[0].item_index) ;
@@ -306,7 +306,6 @@ class UserStorage{
                 const [row2] = await conn.query("UPDATE item_table SET equip = 0 WHERE owner = ? AND item_index = ? AND item_uid != ?;", 
                              [userId, row1[0].item_index, itemId] );
 
-                console.log( row2 );
             }
             else{
                 console.log("not found");
@@ -331,8 +330,6 @@ class UserStorage{
             const [result] = await conn.query("UPDATE item_table SET equip = 1 WHERE item_uid = ? AND owner = ? ;", 
                         [itemId, userId] );
 
-            console.log( result );
-
             if( result.changedRows > 0 ){
                 retVal =  {success:true};
             };
@@ -351,8 +348,6 @@ class UserStorage{
         try{        
             const [result] = await conn.query("UPDATE item_table SET equip = 0 WHERE item_uid = ? AND owner = ? ;", 
                         [itemId, userId] );
-
-            console.log( result );
 
             if( result.changedRows > 0 ){
                 retVal =  {success:true};
@@ -384,8 +379,6 @@ class UserStorage{
 
             const result = await conn.query( sql1s + sql2s );
 
-            console.log( result );
-
             if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0 ) {
                 console.log( "commit");
                 await conn.commit();
@@ -393,6 +386,10 @@ class UserStorage{
             }else{
                 console.log( "rollback : ");                            
                 await conn.rollback();
+                if( result[0][1].affectedRows <= 0 ){
+                    retVal = {success:false, msg:'not enough diamond'};
+                }
+
             }
         } catch( err ){
             console.log( "rollback-", err );
@@ -424,8 +421,6 @@ class UserStorage{
 
             const result = await conn.query( sql1s + sql2s );
 
-            console.log( result );
-
             if( result[0][0].affectedRows > 0 && result[0][1].changedRows > 0 ) {
                 console.log( "commit");
                 await conn.commit();
@@ -452,7 +447,7 @@ class UserStorage{
         let retVal = { success:false };
         try{        
             const result = await conn.query("UPDATE account SET battle_coin = if( battle_coin >= 1,battle_coin - 1, battle_coin) WHERE id = (?);", [user_id] );
-            console.log( result[0] );
+
             if( result[0].changedRows > 0 ){
                 retVal =  {success:true};
             };
@@ -471,7 +466,7 @@ class UserStorage{
         try{        
         
             const result = await conn.query("UPDATE account SET money = money + ? WHERE id = ?;", [money, user_id] );
-            console.log( result[0] );
+
             if( result[0].changedRows > 0 ){
                 retVal =  {success:true};
             };

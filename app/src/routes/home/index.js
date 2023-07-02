@@ -43,4 +43,8 @@ router.put("/equipment/inventory", authUtil.checkToken,ctrl.process.equipItem );
 router.delete("/equipment/inventory", authUtil.checkToken,ctrl.process.sellItem );
 router.put("/equipment/equip", authUtil.checkToken,ctrl.process.unEquipItem );
 
+
+router.get("/quest/daily", authUtil.checkToken,ctrl.process.getUserDailyQuestInfo );
+router.get("/quest/weekly", authUtil.checkToken,ctrl.process.getUserWeeklyQuestInfo );
+router.get("/quest/normal", authUtil.checkToken,ctrl.process.getUserNormalQuestInfo );
 module.exports = router;   

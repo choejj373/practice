@@ -5,6 +5,7 @@ const jwt = require('../../modules/jwt');
 const User = require("../../models/user");
 const UserStorage = require("../../models/userstorage");
 const UserStorageCache = require("../../models/userstoragecache");
+const Quest = require("../../services/quest");
 
 const output = {
     test : ( req,res )=>{
@@ -56,7 +57,23 @@ const output = {
 }
 
 const process = {
+    getUserNormalQuestInfo : async( req, res)=>{
+        console.log( 'process.getUserNormalQuestInfo : ', req.userId );
+        const response = await Quest.getUserNormalQuestInfo( req.userId );
+        return res.json( response );
+    },
+    getUserDailyQuestInfo : async( req, res)=>{
+        console.log( 'process.getUserDailyQuestInfo : ', req.userId );
+        const response = await Quest.getUserDailyQuestInfo( req.userId );
+        return res.json( response );
+    },
+    getUserWeeklyQuestInfo : async( req, res)=>{
+        console.log( 'process.getUserWeeklyQuestInfo : ', req.userId );
+        const response = await Quest.getUserWeeklyQuestInfo( req.userId );
+        return res.json( response );
+    },
     equipItem : async( req, res)=>{
+
         console.log( 'process.equipItem : ', req.userId );
         console.log( req.body )        ;
 
@@ -226,13 +243,26 @@ const process = {
 
         console.log( tradeInfo );
 
-        if( tradeInfo.length > 0 ){
-            // todo : 일단 무료 다이아만 처리하고 있다. 
-            if( tradeInfo[0].type === 1 ){
-                return res.json( {success:true, type:1 });  
-            }
+        const nowTime = new Date().getTime();
+
+        let response = { success:true, tradeList:[] }
+
+        if( Array.isArray( tradeInfo ) && tradeInfo.length > 0 ){
+            tradeInfo.forEach( (trade)=>{
+                let expireTime = new Date( trade.expire_time ).getTime();
+                
+                console.log( nowTime," ", trade.expire_time );
+
+                if( expireTime > nowTime )
+                {
+                    response.tradeList.push( trade );
+                }else{
+                    UserStorage.deleteTradeDailyStore( req.userId, trade.id );
+                }
+
+            })
         }
-        return res.json( {success:true} );
+        return res.json( response );
     }
 }
 

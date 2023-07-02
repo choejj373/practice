@@ -19,17 +19,40 @@ const buyShoesBtn = document.getElementById("buyShoes");
 const invenList = document.getElementById('inventory');
 const sellItemBtn = document.getElementById('sellItemBtn');
 
+const questBtn = document.getElementById('quest');
+const questView = document.getElementById('questView');
+const combatView = document.getElementById('combatView');
+
+// const dailyQuestView = document.getElementById('dailyQuestView');
+// const weeklyQuestView = document.getElementById('weeklyQuestView');
+// const normalQuestView = document.getElementById('normalQuestView');
+
+// const dailyQuestList = document.getElementById('dailyQuestList');
+// const weeklyQuestList = document.getElementById('weeklyQuestList');
+// const normalQuestList = document.getElementById('normalQuestList');
+
+const questList = document.getElementById('questList');
+
+const dailyQuestBtn = document.getElementById('dailyQuestBtn');
+const weeklyQuestBtn = document.getElementById('weeklyQuestBtn');
+const normalQuestBtn = document.getElementById('normalQuestBtn');
+
+
+questBtn.addEventListener("click", showQuestView );
+
+dailyQuestBtn.addEventListener("click", showDailyQuestList );
+weeklyQuestBtn.addEventListener("click", showWeeklyQuestList );
+normalQuestBtn.addEventListener("click", showNormalQuestList );
+
+
+
 sellItemBtn.addEventListener("click", promptInputItemId );
-
-
 buyWeaponBtn.addEventListener("click", ()=>buyItem(1) );
 buyNecklaceBtn.addEventListener("click", ()=>buyItem(2) );
 buyGloveBtn.addEventListener("click", ()=>buyItem(3) );
 buyArmorBtn.addEventListener("click", ()=>buyItem(4) );
 buyBeltBtn.addEventListener("click", ()=>buyItem(5) );
 buyShoesBtn.addEventListener("click", ()=>buyItem(6) );
-
-
 
 logoutBtn.addEventListener("click", logout );
 storeBtn.addEventListener("click", showStore );
@@ -41,6 +64,121 @@ challengeBtn.addEventListener("click", clearMainView );
 
 freeGetBtn.addEventListener("click", getFreeDiamond );
 
+function showQuestView(){
+    console.log('showQuestView');
+    clearCombatRightView();
+    questView.style.display = '';
+
+    showDailyQuestList();
+}
+
+function showDailyQuestList(){
+    console.log('showDailyQuestList');
+
+    fetch("/quest/daily")
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+            //오른쪽 화면에 표시하자.
+            questList.replaceChildren();
+
+            res.quests.forEach((element)=>{
+                let item = document.createElement('li');
+                item.textContent = `ID:${element.id} TYPE:${element.quest_type} EXPIRED:${element.expire_date}`;
+                
+                questList.appendChild( item);
+            })
+
+        } else {
+            alert( res.msg );
+        }
+    })    
+}
+function showWeeklyQuestList(){
+    console.log('showWeeklyQuestList');
+
+    fetch("/quest/weekly")
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+            //오른쪽 화면에 표시하자.
+            questList.replaceChildren();
+
+            res.quests.forEach((element)=>{
+                let item = document.createElement('li');
+                item.textContent = `ID:${element.id} TYPE:${element.quest_type} EXPIRED:${element.expire_date}`;
+                
+                questList.appendChild( item);
+            })
+
+        } else {
+            alert( res.msg );
+        }
+    })    
+    
+}
+function showNormalQuestList(){
+    console.log('showNormalQuestList');
+    fetch("/quest/normal")
+    .then((res) => res.json()) // json() promise
+    .then((res) => {
+        console.log( res );
+        if( res.success ){
+            //오른쪽 화면에 표시하자.
+            questList.replaceChildren();
+
+            res.quests.forEach((element)=>{
+                let item = document.createElement('li');
+                item.textContent = `ID:${element.id} TYPE:${element.quest_type} EXPIRED:${element.expire_date}`;
+                
+                questList.appendChild( item);
+            })
+
+        } else {
+            alert( res.msg );
+        }
+    })        
+    
+}
+
+// function getQuestList(){
+//     fetch("/quest")
+//     .then((res) => res.json()) // json() promise
+//     .then((res) => {
+//         console.log( res );
+//         if( res.success ){
+//             //오른쪽 화면에 표시하자.
+//             dailyQuestList.replaceChildren();
+//             weeklyQuestList.replaceChildren();
+//             normalQuestList.replaceChildren();
+
+//             res.quests.forEach((element)=>{
+//                 let item = document.createElement('li');
+//                 item.textContent = `ID:${element.id} TYPE:${element.quest_type} EXPIRED:${element.expire_date}`;
+                
+//                 switch( element.quest_type ){
+//                     case 1:
+//                         dailyQuestList.appendChild( item);
+//                         break;
+//                     case 2:
+//                         weeklyQuestList.appendChild( item);
+//                         break;
+//                     default:
+//                         normalQuestList.appendChild( item);
+//                         break;
+//                 }
+//             })
+
+//             clearCombatRightView();
+//             questView.style.display = '';
+
+//         } else {
+//             alert( res.msg );
+//         }
+//     })
+// }
 
 function promptInputItemId(){
     console.log( "promptInputItemId");
@@ -175,11 +313,20 @@ function clearMainView()
     mainCombat.style.display = 'none' ;
 }
 
+function clearCombatRightView(){
+    console.log("clearCombatRightView")
+    combatView.style.display = 'none';
+    questView.style.display = 'none';
+}
+
 function showCombat(){
     clearMainView();   
     const element = document.getElementById("mainCombat");
     element.style.display = '' ;
-}
+
+    clearCombatRightView();
+    combatView.style.display = '';
+ }
 
 function showInven()
 {
@@ -239,11 +386,13 @@ function showStore(){
     .then((res) => {
         console.log( res );
         if( res.success ){
-            if( res.type == 1){
-                freeGetBtn.disabled = true;
-            }else{
-                freeGetBtn.disabled = false;
-            }
+            freeGetBtn.disabled = false;
+
+            res.tradeList.forEach((trade)=>{
+                if( trade.type == 1 ){
+                    freeGetBtn.disabled = true;
+                }
+            });
         } else {
             alert( res.msg );
         }

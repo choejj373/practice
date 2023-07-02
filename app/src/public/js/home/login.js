@@ -24,7 +24,7 @@ function login() {
     .then( (res) => {
         console.log( res);
         if( res.success ){
-            location.href = "/";
+            location.href = "/"; 
         } else {
           alert( res.msg ); //=> cathc 발생
             location.href = "/login"
