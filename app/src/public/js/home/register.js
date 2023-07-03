@@ -39,7 +39,7 @@ function register() {
     .then( (res) => {
         //console.log( res);
         if( res.success ){
-            location.href = "/login";
+            location.href = "/";
         } else {
           alert( res.msg ); //=> cathc 발생
           //  location.href = "/login"

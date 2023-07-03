@@ -23,7 +23,7 @@ class Quest{
         QuestStorage.loadQuestList()
         .then((result)=>{
             this.questList = result.quests;
-            console.log( this.questList );
+            // console.log( this.questList );
         })
         .catch(console.log)
     }

@@ -1,7 +1,19 @@
+//서버에서 발급받은 게스트 계정 저장
+let guestId = undefined;
 
+const topView = document.getElementById("userInfo");
+const bottomView = document.getElementById("navBottom");
 const mainView = document.getElementById("mainView");
 
-const logoutBtn = document.getElementById("logout");
+const loginView = document.getElementById("loginView");
+const guestLoginBtn = document.getElementById("guestLoginBtn");
+const moveRegisterBtn = document.getElementById("moveRegisterBtn");
+
+
+const registerView = document.getElementById("registerView");
+const registerBtn = document.getElementById("registerBtn");
+
+
 const storeBtn = document.getElementById("store");
 const invenBtn = document.getElementById("inven");
 const combatBtn = document.getElementById("combat");
@@ -37,14 +49,15 @@ const dailyQuestBtn = document.getElementById('dailyQuestBtn');
 const weeklyQuestBtn = document.getElementById('weeklyQuestBtn');
 const normalQuestBtn = document.getElementById('normalQuestBtn');
 
+moveRegisterBtn.addEventListener("click", showResisterView );
+registerBtn.addEventListener("click", registerAccount );
+guestLoginBtn.addEventListener("click", guestLogin );
 
 questBtn.addEventListener("click", showQuestView );
 
 dailyQuestBtn.addEventListener("click", showDailyQuestList );
 weeklyQuestBtn.addEventListener("click", showWeeklyQuestList );
 normalQuestBtn.addEventListener("click", showNormalQuestList );
-
-
 
 sellItemBtn.addEventListener("click", promptInputItemId );
 buyWeaponBtn.addEventListener("click", ()=>buyItem(1) );
@@ -54,7 +67,7 @@ buyArmorBtn.addEventListener("click", ()=>buyItem(4) );
 buyBeltBtn.addEventListener("click", ()=>buyItem(5) );
 buyShoesBtn.addEventListener("click", ()=>buyItem(6) );
 
-logoutBtn.addEventListener("click", logout );
+
 storeBtn.addEventListener("click", showStore );
 invenBtn.addEventListener("click", showInven );
 combatBtn.addEventListener("click", showCombat );
@@ -63,6 +76,108 @@ evolutionBtn.addEventListener("click", clearMainView );
 challengeBtn.addEventListener("click", clearMainView );
 
 freeGetBtn.addEventListener("click", getFreeDiamond );
+
+
+const registerId = document.getElementById("registerId");
+const registerName = document.getElementById("registerName");
+const registerPsword = document.getElementById("registerPsword");
+const registerPswordConfirm = document.getElementById("registerPswordConfirm");
+
+function getGuestAccount()
+{
+    console.log("getGuestAccount");
+
+    fetch("/user/guest", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify()
+    })
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        console.log( res);
+        if( res.success ){
+            guestId = res.guestId;
+            loginGuestAccount();
+        } else {
+          alert( res.msg );
+        }
+    })
+}
+
+function loginGuestAccount(){
+    console.log("loginGuestAccount");
+    console.log( guestId );
+
+    fetch("/user/guest", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify( { guestId : `${guestId}` } )
+    })
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        //console.log( res);
+        if( res.success ){
+            showMainView();
+        } else {
+          alert( res.msg );
+        }
+    })
+}
+
+function guestLogin(){
+    // guestId 가 있다면 로그인 요청
+    // guestId 가 없다면 생성 요청
+    if( guestId == undefined ){
+        getGuestAccount();
+    }else{
+        loginGuestAccount();
+    }
+
+
+}
+
+function registerAccount(){
+    if( !registerId.value ) return alert("아이디를 입력해주세요");
+    if( registerPsword.value !== registerPswordConfirm.value ){
+        return alert("패스워드가 다릅니다");
+    }
+   
+    // pswordConfirm: pswordConfirm.value,
+
+    const req = {
+        id: registerId.value,
+        name: registerName.value,
+        psword: registerPsword.value,
+        
+    };
+
+   console.log( req );
+
+    fetch("/user", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req)
+    })
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        //console.log( res);
+        if( res.success ){
+            //location.href = "/";
+            showLoginView();
+        } else {
+          alert( res.msg ); //=> cathc 발생
+          //  location.href = "/login"
+        }
+
+
+    })
+}
 
 function showQuestView(){
     console.log('showQuestView');
@@ -95,6 +210,7 @@ function showDailyQuestList(){
 
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })    
 }
@@ -121,6 +237,7 @@ function showWeeklyQuestList(){
 
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })    
     
@@ -147,6 +264,7 @@ function showNormalQuestList(){
 
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })        
     
@@ -210,6 +328,7 @@ function promptInputItemId(){
             showInven();
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })
 }
@@ -232,6 +351,7 @@ function onClickedEquip( element ){
             showInven();
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })
 }
@@ -267,6 +387,7 @@ function onClickedQuest( element){
             // showInven();
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })
 }
@@ -289,6 +410,7 @@ function onClickedInven( element ){
             showInven();
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })
 }
@@ -314,6 +436,7 @@ function buyItem( type )
 
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })
 
@@ -338,6 +461,7 @@ function getFreeDiamond(){
             freeGetBtn.disabled = true;
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
         }
     })
 }
@@ -439,6 +563,8 @@ function showStore(){
             });
         } else {
             alert( res.msg );
+            processResponseFail( res.msg )
+
         }
     })
 
@@ -448,9 +574,12 @@ function showStore(){
     // 무료 다이아를 얻지 않았다면 무료 구매 활성화 아니라면 비활성화
 }
 
+const logoutBtn = document.getElementById("logout");
+logoutBtn.addEventListener("click", logout );
+
 function logout(){
     console.log( "clicked" );
-    fetch("/home", {
+    fetch("/user", {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -461,23 +590,57 @@ function logout(){
     .then((res) => {
         console.log( res );
         if( res.success ){
-            location.href = "/login";
+            topView.style.display = 'none';
+            bottomView.style.display = 'none';
+            mainView.style.display = 'none';
+
+            loginView.style.display = '';
+            registerView.style.display = 'none';
         } else {
             alert( res.msg );
         }
     })
 }
 
-const usernameTxt = document.getElementById("name");
-const expTxt = document.getElementById("exp");
-const battlecoinTxt = document.getElementById("battlecoin");
-const diamondTxt = document.getElementById("diamond");
-const moneyTxt = document.getElementById("money");
+function showMainView(){
+    mainView.style.display = '';
+    topView.style.display = '';
+    bottomView.style.display = '';
 
-window.onload = function(){
-    console.log( "window onload" );
-    
-    fetch("/home" )// get
+    loginView.style.display = 'none';
+    registerView.style.display = 'none';
+}
+
+function showLoginView()
+{
+    mainView.style.display = 'none';
+    topView.style.display = 'none';
+    bottomView.style.display = 'none';
+
+    loginView.style.display = '';
+    registerView.style.display = 'none';
+}
+
+function showResisterView()
+{
+    mainView.style.display = 'none';
+    topView.style.display = 'none';
+    bottomView.style.display = 'none';
+
+    loginView.style.display = 'none';
+    registerView.style.display = '';
+}
+
+function processResponseFail( msg )
+{
+    if( msg.indexOf('token') >= 0){
+        showLoginView();
+    }
+}
+
+function getUserInfo()
+{
+    fetch("/user" )// get user info
      .then((res) => res.json()) // json() promise
      .then((res) => {
          console.log( res );
@@ -489,8 +652,64 @@ window.onload = function(){
              diamondTxt.value = res.diamond;
              moneyTxt.value = res.userMoney;
 
+
          } else {
-             alert( res.msg );
+            alert( res.msg )
+            processResponseFail( res.msg )
+
          }
      })
+}
+
+const loginId = document.getElementById("loginId");
+const loginPassword = document.getElementById("loginPassword");
+const loginBtn = document.getElementById("loginBtn");
+
+loginBtn.addEventListener("click", login );
+
+function login() {
+
+    const req = {
+        id: loginId.value,
+        psword: loginPassword.value,
+    };
+
+    console.log( req );
+    
+    fetch("/user", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req)
+    })
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        console.log( res);
+        if( res.success ){
+            mainView.style.display = '';
+            topView.style.display = '';
+            bottomView.style.display = '';
+
+            loginView.style.display = 'none';
+            registerView.style.display = 'none';
+
+            getUserInfo();
+
+        } else {
+          alert( res.msg ); 
+        }
+    })
+};
+
+const usernameTxt = document.getElementById("name");
+const expTxt = document.getElementById("exp");
+const battlecoinTxt = document.getElementById("battlecoin");
+const diamondTxt = document.getElementById("diamond");
+const moneyTxt = document.getElementById("money");
+
+window.onload = function(){
+    console.log( "window onload" );
+    showMainView();
+    getUserInfo();
 };

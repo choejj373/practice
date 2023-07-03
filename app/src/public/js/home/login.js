@@ -26,8 +26,7 @@ function login() {
         if( res.success ){
             location.href = "/"; 
         } else {
-          alert( res.msg ); //=> cathc 발생
-            location.href = "/login"
+          alert( res.msg ); 
         }
     })
 };

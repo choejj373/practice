@@ -1,5 +1,7 @@
 "use strict"
 
+const { v4 } = require('uuid');
+
 const UserStorage = require("./userstorage");
 const Quest = require("../services/quest");
 
@@ -39,12 +41,38 @@ class User{
         this.accountId = body.id;
     };
     
+    async guestRegister(){
+        console.log( "User.guestRegister");
+
+        this.body.id = v4();
+        this.body.name = "guest";
+        this.accountId = this.body.id;
+
+        const guest = this.body;
+        
+        const password = "";
+        const salt = "";
+
+        console.log( guest );
+
+        const result = await UserStorage.save( guest, password, salt );
+
+        console.log( result );
+        if( result.success ){
+            result.guestId = this.body.id;
+
+            Quest.createUserQuestAll( result.userId );
+        }
+        return result;
+    }
+
     async register(){
         console.log( "User.register");
 
         const client = this.body;
         const { password, salt } = await createHashedPassword( client.psword);
         // console.log( password );
+        console.log( client );
         const result = await UserStorage.save( client, password, salt );
 
         console.log( result );
@@ -53,6 +81,18 @@ class User{
         }
         return result;
     };
+
+    async guestLogin( guestId ){
+
+        const accountInfo = await UserStorage.getAccountInfo( guestId );
+        console.log( accountInfo );
+
+        if( accountInfo ){
+            return { success : true, accountInfo : accountInfo };
+        }
+
+        return { success : false, msg : "존재하지 않는 아이디 입니다"}
+    }
 
     async login(){
         const body = this.body;

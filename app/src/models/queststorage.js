@@ -272,8 +272,6 @@ class QuestStorage
     async createUserQuestAll( userId, questList )
     {
         console.log( "QuestStorage.createUserQuestAll");
-        console.log( userId );
-        console.log( questList );
 
         const conn = await dbPool.getConnection();
         

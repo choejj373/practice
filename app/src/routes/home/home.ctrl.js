@@ -27,7 +27,7 @@ const output = {
     home : async (req, res) => {
         
         console.log("output.home userId:", req.userId);
-
+        //check token
         res.render("home/index")
     },
 
@@ -184,6 +184,50 @@ const process = {
 
         }
         return res.json(response)},
+    
+    guestRegister : async( req, res) => {
+        console.log( "process.guestRegister" );
+        const user = new User( req.body );
+        let response;
+        try{
+            response = await user.guestRegister();
+            console.log( response );
+        }
+        catch( err )
+        {
+            console.log( err );
+        }
+        return res.json(response)
+    },
+    guestLogin : async( req, res ) => {
+        console.log( "process.guestLogin" );
+
+        const user = new User( req.body );
+
+        console.log( req.body.guestId );
+        const response = await user.guestLogin( req.body.guestId );
+
+        if( response.success )
+        {
+            console.log( response.accountInfo );
+            const jwtToken = await jwt.sign( response.accountInfo );
+            
+            const cookieOption = {
+                httpOnly: true,
+                maxAge : 1000 * 60 * 60,
+                secure : false,
+                // 1 more
+            }
+
+            res.cookie( 'token', jwtToken.token, cookieOption );
+// todo user_id를 가져온다;;;
+            Quest.processLogin( response.accountInfo.user_id );
+
+            return res.json( { success:true, token: jwtToken.token });
+
+        }
+        return res.json(response)
+    },
     register: async( req, res) => {
         console.log( "process.register" );
         const user = new User( req.body );

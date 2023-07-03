@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="/css/home/login.css">     -->
     <script src="/js/home/home.js" defer> </script>
     <title>Document</title>
 </head>
@@ -15,7 +16,29 @@
         골드<input id = "money" type="text" value="0" style="width:50px" readonly></intput> 
 
     </div>
-    <div id = "mainView" style = "width:600px; height:400px;background-color:#CF0">
+
+    <div id = "loginView"  style = "display:none;width:600px; height:400px;background-color:#CF0">
+        <input id = "loginId" type="text" placeholder="아이디"/><br>
+        <input id = "loginPassword" type="password" placeholder="패스워드"/><br>
+        <input id = "loginBtn" type="button" value="login"></input><br><br>
+
+        <input id="guestLoginBtn" type="button" value="게스트 로그인"></input>
+        <input id="moveRegisterBtn" type="button" value="계정 생성"></input><br>
+
+        <!-- <p class="message">Not registered? <a href="/register">Create an account</a></p> -->
+    </div>
+    <div id = "registerView" class="register-page" style = "display:none;width:600px; height:400px;background-color:#CF0">
+        <div class="form">
+          <form class="register-form">
+            <input id = "registerId" type="text" placeholder="아이디"/><br>
+            <input id = "registerName" type="text" placeholder="이름"/><br>
+            <input id = "registerPsword" type="password" placeholder="패스워드"/><br>
+            <input id = "registerPswordConfirm" type="password" placeholder="패스워드 확인"/><br>
+            <input id = "registerBtn" type = "button" value="Signup"></input>
+          </form>
+        </div>
+      </div>
+    <div id = "mainView" style = "display:none;width:600px; height:400px;background-color:#CF0">
         <div id="mainStore" style = "display:none;">
             <div style = "width:300px; height:400px; float: left; background-color:beige">
                 <p> 일일 상점</p>
