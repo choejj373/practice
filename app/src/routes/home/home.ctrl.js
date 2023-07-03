@@ -94,8 +94,11 @@ const process = {
     diamondstore: async( req, res)=>{
         console.log( 'process.diamondstore : ', req.userId );
         console.log( req.body )        ;
-        
-        let response = await UserStorage.buyItemByDia( req.userId, req.body.itemType, 10 );
+
+        const price = 10;
+        let response = await UserStorage.buyItemByDia( req.userId, req.body.itemType, price );
+
+        Quest.processUseDiamond( req.userId, price );
 
         return res.json(response);
     },

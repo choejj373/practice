@@ -50,9 +50,87 @@ class QuestStorage
         return retVal;
     }
 
-    //퀘스트 완료 조건 체크하여 Diamond 지급
-    //체크 조건이 좀 많은것 같은데 줄일 방법이 있을까?
-    // id로 한번에 찾기 때문에 속도 문제는 없을것 같아.
+    // rewardValue : 아이템의 갯수, 소모 아이템등의 갯수가 존재하는 아이템의 경우 사용 defalut = 1
+    async rewardItem( userId, questId, questIndex, fulfillValue, rewardValue, rewardSubtype )
+    {
+        const conn = await dbPool.getConnection();
+        let retVal = { success:false };
+        try{
+            const sql1 = "UPDATE user_quest SET complete = 1 WHERE  id = ? AND complete = 0 AND owner = ? AND quest_index = ? AND value >= ?;";
+            const sql1a = [ questId, userId, questIndex, fulfillValue ];
+            const sql1s = mysql.format( sql1, sql1a );
+            console.log( sql1s );
+
+            const sql2 = "INSERT INTO item_table (item_index, owner) values (?,?);";
+            const sql2a = [rewardSubtype, userId]
+            const sql2s = mysql.format( sql2, sql2a);
+
+            console.log( sql2s );
+
+            await conn.beginTransaction();
+
+            const result = await conn.query( sql1s + sql2s );
+
+            if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0 ) {
+                console.log( "commit");
+                await conn.commit();
+                retVal = {success:true};
+            }else{
+                console.log( "rollback : ", "db query failed");                            
+                await conn.rollback();
+                retVal = {success:false, msg:"db query failed"};
+            }
+
+        } catch( err ){
+            console.log( "rollback : ", err );
+            retVal = {success:false, msg:"db query error"};
+            await conn.rollback();
+        } finally{
+            console.log( "finally");
+            conn.release();
+        }
+        return retVal;      
+    }
+    async rewardMoney( userId, questId, questIndex, fulfillValue, rewardValue )
+    {
+        const conn = await dbPool.getConnection();
+        let retVal = { success:false };
+        try{
+            const sql1 = "UPDATE user_quest SET complete = 1 WHERE  id = ? AND complete = 0 AND owner = ? AND quest_index = ? AND value >= ?;";
+            const sql1a = [ questId, userId, questIndex, fulfillValue ];
+            const sql1s = mysql.format( sql1, sql1a );
+            console.log( sql1s );
+
+            const sql2a = [ rewardValue, userId ];
+            const sql2 = "UPDATE account SET money = money + ? WHERE id = ?;";
+            const sql2s = mysql.format( sql2, sql2a);
+
+            console.log( sql2s );
+
+            await conn.beginTransaction();
+
+            const result = await conn.query( sql1s + sql2s );
+
+            if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0 ) {
+                console.log( "commit");
+                await conn.commit();
+                retVal = {success:true};
+            }else{
+                console.log( "rollback : ", "db query failed");                            
+                await conn.rollback();
+                retVal = {success:false, msg:"db query failed"};
+            }
+
+        } catch( err ){
+            console.log( "rollback : ", err );
+            retVal = {success:false, msg:"db query error"};
+            await conn.rollback();
+        } finally{
+            console.log( "finally");
+            conn.release();
+        }
+        return retVal;        
+    }
     async rewardDiamond( userId, questId, questIndex, fulfillValue, rewardValue )
     {
         const conn = await dbPool.getConnection();

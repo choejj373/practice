@@ -13,8 +13,8 @@ const moment = require('moment');
 // 5. 보상 부여도 여기서
 
 // enum
-// fulfill type : 1 - 로그인, 
-// reward type : 1 - 다이아몬드
+// fulfill type : 1 - 로그인, 2 - 다이아 사용
+// reward type : 1 - 다이아몬드, 2 - 골드, 3 - 아이템
 class Quest{
 
 // 여기서 userquestinfo를 가져온다.
@@ -51,6 +51,7 @@ class Quest{
         let result = { 
             rewardType : 0,
             rewardValue : 0,
+            rewardSubtype : 0,
             fulfill_value : 0
         }
 
@@ -59,6 +60,7 @@ class Quest{
                 result.rewardType = quest.reward_type;
                 result.rewardValue = quest.reward_value;
                 result.fulfill_value = quest.fulfill_value;
+                result.rewardSubtype = quest.reward_subtype;
             }
         });
 
@@ -75,14 +77,37 @@ class Quest{
 
         // DB에 userId, questId, questIndex, value >= fulfill_value , complete = 0 으로 체크하여
         // set complete = 1 && 보상 지급
-        if( result.rewardType == 1)// 다이아몬드
+        switch( result.rewardType )
         {
-            response = QuestStorage.rewardDiamond( userId, questId, questIndex, result.fulfill_value, result.rewardValue );
+            case 1:// 다이아몬드
+                response = QuestStorage.rewardDiamond( userId, questId, questIndex, result.fulfill_value, result.rewardValue );
+                break;
+            case 2://골드
+                response = QuestStorage.rewardMoney( userId, questId, questIndex, result.fulfill_value, result.rewardValue );
+                break;
+            case 3://아이템
+                console.log("TODO" );
+                response = QuestStorage.rewardItem( userId, questId, questIndex, result.fulfill_value, result.rewardValue, result.rewardSubtype );
+                break;
+            default:
+                console.log("Invalid reward Type : ", result.rewardType );
+                break;
         }
         return response;
     }
 
-    //로그인시에 퀘스트에서 처리할것들
+    // 다이아 소모시 퀘스트 값 변경
+    processUseDiamond( userId, value )
+    {
+        const questIndexList = this.getQuestIndexByFulfill( 2 );
+        // console.log( questIndexList );
+        questIndexList.forEach( (questIndex)=>{
+            // console.log( questIndex );
+            QuestStorage.addUserQuestValue( userId, questIndex, value );
+        });
+    }
+    
+    //로그인시 퀘스트 값 변경
     processLogin( userId ){
 
         const questIndexList = this.getQuestIndexByFulfill( 1 );
