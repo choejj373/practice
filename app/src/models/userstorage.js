@@ -30,7 +30,7 @@ class UserStorage{
         const conn = await dbPool.getConnection();
 
         try{
-            const [row] = await conn.query("SELECT battle_coin, update_time FROM account WHERE id = ?;", [user_id] );
+            const [row] = await conn.query("SELECT battle_coin, update_time FROM user WHERE id = ?;", [user_id] );
             console.log( row );
             
             if( Array.isArray(row) && row.length === 0 ) {
@@ -66,7 +66,7 @@ class UserStorage{
                         if( newBattleCoin > maxBattleCoin ){ newBattleCoin = maxBattleCoin;}
                         console.log( "new battle coin : ", newBattleCoin );
     
-                        const result1 = await conn.query("UPDATE account SET battle_coin = ?, update_time = DATE_ADD( update_time, INTERVAL ? MINUTE) WHERE id = ?",
+                        const result1 = await conn.query("UPDATE user SET battle_coin = ?, update_time = DATE_ADD( update_time, INTERVAL ? MINUTE) WHERE id = ?",
                                             [ newBattleCoin, elapsedCount  * 5, user_id ]);
     
                         // console.log( result1 );
@@ -80,7 +80,7 @@ class UserStorage{
                 {
                     console.log("battle coin is full : ", row[0].battle_coin );
 
-                    const result1 = await conn.query("UPDATE account SET update_time = ? WHERE id = ?",
+                    const result1 = await conn.query("UPDATE user SET update_time = ? WHERE id = ?",
                                 [ new Date(), user_id ]);
     
                     // console.log( result1 );
@@ -123,15 +123,16 @@ class UserStorage{
         return retVal;
     }
 
-    static async getUserInfo(id){
 
-        await UserStorage.updateBattleCoin( id );
+    static async getAccountInfo(id){
+
+        // await UserStorage.updateBattleCoin( id );
 
         const conn = await dbPool.getConnection();
         let retVal;
 
         try{
-            const [row] = await conn.query("SELECT * FROM account WHERE id = ?;", [id] );
+            const [row] = await conn.query("select account.*, user.id as user_id from account left join user on account.id = user.owner;", [id] );
             retVal = row[0];
         }catch( err ){
             console.log( err );
@@ -141,22 +142,69 @@ class UserStorage{
         return retVal;
     }
 
-    static async save( userInfo ,hashedpassword, salt ){
+    static async getUserInfo(id){
+
+        await UserStorage.updateBattleCoin( id );
+
+        const conn = await dbPool.getConnection();
+        let retVal;
+
+        try{
+            const [row] = await conn.query("SELECT * FROM user WHERE id = ?;", [id] );
+            retVal = row[0];
+        }catch( err ){
+            console.log( err );
+        }finally{
+            conn.release();
+        }
+        return retVal;
+    }
+
+    static async save( accountInfo ,hashedpassword, salt ){
         
         console.log( "UserStorage.save");
 
         const conn = await dbPool.getConnection();
         let retVal;
         try{
-            // await conn.beginTransaction();
-            const result = await conn.query("INSERT INTO account(id, name, psword, salt) VALUES(?, ?, ?, ?);", 
-                     [userInfo.id,userInfo.name,hashedpassword, salt] );
 
-            // await conn.commit();
+
+            const sql1 = "INSERT INTO account(id, name, psword, salt) VALUES(?, ?, ?, ?);";
+            const sql1a = [accountInfo.id,accountInfo.name,hashedpassword, salt];
+            const sql1s = mysql.format( sql1, sql1a );
+            console.log( sql1s );
+
+            //over flow check
+            const sql2a = [ accountInfo.name, accountInfo.id ];
+            const sql2 = "INSERT INTO user( name, owner ) VALUES (?,?);";
+            const sql2s = mysql.format( sql2, sql2a);
+
+            console.log( sql2s );
+
+            await conn.beginTransaction();
+
+            const result = await conn.query( sql1s + sql2s );
+
+            if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0 ) {
+                console.log( "commit");
+                await conn.commit();
+                retVal = {success:true};
+            }else{
+                console.log( "rollback");                            
+                await conn.rollback();
+            }
+         
+            await conn.commit();
             retVal = {success:true};
+            const [row] = await conn.query("SELECT id FROM user WHERE owner = ?;", [accountInfo.id] );
+
+            if( row.length > 0 ){
+                retVal.userId = row[0].id;
+            }
+
         }catch( err ){
             console.log( err );
-            // await conn.rollback();
+            await conn.rollback();
             retVal = {success:false};
         }finally{
             conn.release();
@@ -193,7 +241,7 @@ class UserStorage{
             //over flow check
             const price = 100;
             const sql2a = [ price, user_id ];
-            const sql2 = "UPDATE account SET money = money + ? WHERE id = ?;";
+            const sql2 = "UPDATE user SET money = money + ? WHERE id = ?;";
             const sql2s = mysql.format( sql2, sql2a);
 
             console.log( sql2s );
@@ -264,7 +312,7 @@ class UserStorage{
 
             
             const sql2a = [freeDiamond, user_id]
-            const sql2 = "UPDATE account SET diamond = diamond + ? WHERE id = ?;";
+            const sql2 = "UPDATE user SET diamond = diamond + ? WHERE id = ?;";
             const sql2s = mysql.format( sql2, sql2a );
 
             console.log( sql2s );
@@ -370,7 +418,7 @@ class UserStorage{
             console.log( sql1s );
 
             const sql2a = [price, user_id, price]
-            const sql2 = "UPDATE account SET diamond = diamond - ? WHERE id = ? AND diamond >= ?;";
+            const sql2 = "UPDATE user SET diamond = diamond - ? WHERE id = ? AND diamond >= ?;";
             const sql2s = mysql.format( sql2, sql2a );
 
             console.log( sql2s );
@@ -412,7 +460,7 @@ class UserStorage{
 
             const price = 100;
             const sql2a = [price, price, user_id]
-            const sql2 = "UPDATE account SET money = if( money >= ?, money - ?, money) WHERE id = ?;";
+            const sql2 = "UPDATE user SET money = if( money >= ?, money - ?, money) WHERE id = ?;";
             const sql2s = mysql.format( sql2, sql2a );
 
             console.log( sql2s );
@@ -446,7 +494,7 @@ class UserStorage{
         const conn = await dbPool.getConnection();
         let retVal = { success:false };
         try{        
-            const result = await conn.query("UPDATE account SET battle_coin = if( battle_coin >= 1,battle_coin - 1, battle_coin) WHERE id = (?);", [user_id] );
+            const result = await conn.query("UPDATE user SET battle_coin = if( battle_coin >= 1,battle_coin - 1, battle_coin) WHERE id = (?);", [user_id] );
 
             if( result[0].changedRows > 0 ){
                 retVal =  {success:true};
@@ -465,7 +513,7 @@ class UserStorage{
         let retVal = { success:false };
         try{        
         
-            const result = await conn.query("UPDATE account SET money = money + ? WHERE id = ?;", [money, user_id] );
+            const result = await conn.query("UPDATE user SET money = money + ? WHERE id = ?;", [money, user_id] );
 
             if( result[0].changedRows > 0 ){
                 retVal =  {success:true};

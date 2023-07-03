@@ -102,7 +102,7 @@ class QuestStorage
             console.log( sql1s );
 
             const sql2a = [ rewardValue, userId ];
-            const sql2 = "UPDATE account SET money = money + ? WHERE id = ?;";
+            const sql2 = "UPDATE user SET money = money + ? WHERE id = ?;";
             const sql2s = mysql.format( sql2, sql2a);
 
             console.log( sql2s );
@@ -142,7 +142,7 @@ class QuestStorage
             console.log( sql1s );
 
             const sql2a = [ rewardValue, userId ];
-            const sql2 = "UPDATE account SET diamond = diamond + ? WHERE id = ?;";
+            const sql2 = "UPDATE user SET diamond = diamond + ? WHERE id = ?;";
             const sql2s = mysql.format( sql2, sql2a);
 
             console.log( sql2s );

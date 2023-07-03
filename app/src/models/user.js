@@ -36,7 +36,7 @@ class User{
 
     constructor(body){
         this.body = body;
-        this.userId = body.id;
+        this.accountId = body.id;
     };
     
     async register(){
@@ -46,9 +46,10 @@ class User{
         const { password, salt } = await createHashedPassword( client.psword);
         // console.log( password );
         const result = await UserStorage.save( client, password, salt );
+
         console.log( result );
         if( result.success){
-            Quest.createUserQuestAll( this.userId );
+            Quest.createUserQuestAll( result.userId );
         }
         return result;
     };
@@ -56,13 +57,14 @@ class User{
     async login(){
         const body = this.body;
 
-        const userInfo = await UserStorage.getUserInfo( body.id );
+        const accountInfo = await UserStorage.getAccountInfo( this.accountId );
+        console.log( accountInfo );
 
-        if( userInfo ){
-            const hashedPwd = await makePasswordHashed( userInfo.salt, body.psword );
-            if( userInfo.id === this.body.id && userInfo.psword === hashedPwd){
+        if( accountInfo ){
+            const hashedPwd = await makePasswordHashed( accountInfo.salt, body.psword );
+            if( accountInfo.id === this.body.id && accountInfo.psword === hashedPwd){
 
-                return { success : true, name : userInfo.name };
+                return { success : true, accountInfo : accountInfo };
             }
             return { success : false , msg : " 비밀번호가 틀렸습니다."}
         }

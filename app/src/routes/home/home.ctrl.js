@@ -166,7 +166,8 @@ const process = {
 
         if( response.success )
         {
-            const jwtToken = await jwt.sign( user.userId );
+            console.log( response.accountInfo );
+            const jwtToken = await jwt.sign( response.accountInfo );
             
             const cookieOption = {
                 httpOnly: true,
@@ -176,8 +177,8 @@ const process = {
             }
 
             res.cookie( 'token', jwtToken.token, cookieOption );
-
-            Quest.processLogin( user.userId );
+// todo user_id를 가져온다;;;
+            Quest.processLogin( response.accountInfo.user_id );
 
             return res.json( { success:true, token: jwtToken.token });
 
