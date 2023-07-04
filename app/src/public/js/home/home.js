@@ -1,16 +1,18 @@
 //서버에서 발급받은 게스트 계정 저장
 let guestId = undefined;
 
-const topView = document.getElementById("userInfo");
-const bottomView = document.getElementById("navBottom");
+const loginView = document.getElementById("loginView");
+const registerView = document.getElementById("registerView");
 const mainView = document.getElementById("mainView");
 
-const loginView = document.getElementById("loginView");
+const topView = document.getElementById("userInfo");
+const bottomView = document.getElementById("navBottom");
+
 const guestLoginBtn = document.getElementById("guestLoginBtn");
 const moveRegisterBtn = document.getElementById("moveRegisterBtn");
+const moveLoginBtn = document.getElementById("moveLoginBtn");
 
 
-const registerView = document.getElementById("registerView");
 const registerBtn = document.getElementById("registerBtn");
 
 
@@ -50,6 +52,8 @@ const weeklyQuestBtn = document.getElementById('weeklyQuestBtn');
 const normalQuestBtn = document.getElementById('normalQuestBtn');
 
 moveRegisterBtn.addEventListener("click", showResisterView );
+moveLoginBtn.addEventListener("click", showLoginView );
+
 registerBtn.addEventListener("click", registerAccount );
 guestLoginBtn.addEventListener("click", guestLogin );
 
@@ -83,51 +87,6 @@ const registerName = document.getElementById("registerName");
 const registerPsword = document.getElementById("registerPsword");
 const registerPswordConfirm = document.getElementById("registerPswordConfirm");
 
-function getGuestAccount()
-{
-    console.log("getGuestAccount");
-
-    fetch("/user/guest", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify()
-    })
-    .then( (res) => res.json()) // json() promise
-    .then( (res) => {
-        console.log( res);
-        if( res.success ){
-            guestId = res.guestId;
-            loginGuestAccount();
-        } else {
-          alert( res.msg );
-        }
-    })
-}
-
-function loginGuestAccount(){
-    console.log("loginGuestAccount");
-    console.log( guestId );
-
-    fetch("/user/guest", {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify( { guestId : `${guestId}` } )
-    })
-    .then( (res) => res.json()) // json() promise
-    .then( (res) => {
-        //console.log( res);
-        if( res.success ){
-            showMainView();
-        } else {
-          alert( res.msg );
-        }
-    })
-}
-
 function guestLogin(){
     // guestId 가 있다면 로그인 요청
     // guestId 가 없다면 생성 요청
@@ -136,8 +95,6 @@ function guestLogin(){
     }else{
         loginGuestAccount();
     }
-
-
 }
 
 function registerAccount(){
@@ -269,44 +226,6 @@ function showNormalQuestList(){
     })        
     
 }
-
-// function getQuestList(){
-//     fetch("/quest")
-//     .then((res) => res.json()) // json() promise
-//     .then((res) => {
-//         console.log( res );
-//         if( res.success ){
-//             //오른쪽 화면에 표시하자.
-//             dailyQuestList.replaceChildren();
-//             weeklyQuestList.replaceChildren();
-//             normalQuestList.replaceChildren();
-
-//             res.quests.forEach((element)=>{
-//                 let item = document.createElement('li');
-//                 item.textContent = `ID:${element.id} TYPE:${element.quest_type} EXPIRED:${element.expire_date}`;
-                
-//                 switch( element.quest_type ){
-//                     case 1:
-//                         dailyQuestList.appendChild( item);
-//                         break;
-//                     case 2:
-//                         weeklyQuestList.appendChild( item);
-//                         break;
-//                     default:
-//                         normalQuestList.appendChild( item);
-//                         break;
-//                 }
-//             })
-
-//             clearCombatRightView();
-//             questView.style.display = '';
-
-//         } else {
-//             alert( res.msg );
-//         }
-//     })
-// }
-
 function promptInputItemId(){
     console.log( "promptInputItemId");
     const itemId = prompt("아이템 아이디를 입력해주세요");
@@ -590,12 +509,7 @@ function logout(){
     .then((res) => {
         console.log( res );
         if( res.success ){
-            topView.style.display = 'none';
-            bottomView.style.display = 'none';
-            mainView.style.display = 'none';
-
-            loginView.style.display = '';
-            registerView.style.display = 'none';
+            showLoginView();
         } else {
             alert( res.msg );
         }
@@ -603,30 +517,21 @@ function logout(){
 }
 
 function showMainView(){
-    mainView.style.display = '';
-    topView.style.display = '';
-    bottomView.style.display = '';
-
     loginView.style.display = 'none';
     registerView.style.display = 'none';
+    mainView.style.display = '';
 }
 
 function showLoginView()
 {
     mainView.style.display = 'none';
-    topView.style.display = 'none';
-    bottomView.style.display = 'none';
-
-    loginView.style.display = '';
     registerView.style.display = 'none';
+    loginView.style.display = '';    
 }
 
 function showResisterView()
 {
     mainView.style.display = 'none';
-    topView.style.display = 'none';
-    bottomView.style.display = 'none';
-
     loginView.style.display = 'none';
     registerView.style.display = '';
 }
@@ -635,6 +540,8 @@ function processResponseFail( msg )
 {
     if( msg.indexOf('token') >= 0){
         showLoginView();
+    }else{
+        alert( msg )
     }
 }
 
@@ -651,12 +558,8 @@ function getUserInfo()
              battlecoinTxt.value = res.battleCoin;
              diamondTxt.value = res.diamond;
              moneyTxt.value = res.userMoney;
-
-
          } else {
-            alert( res.msg )
             processResponseFail( res.msg )
-
          }
      })
 }
@@ -687,13 +590,7 @@ function login() {
     .then( (res) => {
         console.log( res);
         if( res.success ){
-            mainView.style.display = '';
-            topView.style.display = '';
-            bottomView.style.display = '';
-
-            loginView.style.display = 'none';
-            registerView.style.display = 'none';
-
+            showMainView();
             getUserInfo();
 
         } else {
@@ -701,6 +598,52 @@ function login() {
         }
     })
 };
+
+function getGuestAccount()
+{
+    console.log("getGuestAccount");
+
+    fetch("/user/guest", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify()
+    })
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        console.log( res);
+        if( res.success ){
+            guestId = res.guestId;
+            loginGuestAccount();
+        } else {
+          alert( res.msg );
+        }
+    })
+}
+
+function loginGuestAccount(){
+    console.log("loginGuestAccount");
+    console.log( guestId );
+
+    fetch("/user/guest", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify( { guestId : `${guestId}` } )
+    })
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        //console.log( res);
+        if( res.success ){
+            showMainView();
+            getUserInfo();
+        } else {
+          alert( res.msg );
+        }
+    })
+}
 
 const usernameTxt = document.getElementById("name");
 const expTxt = document.getElementById("exp");

@@ -133,7 +133,7 @@ class UserStorage{
 
         try{
             const [row] = await conn.query("select account.*, user.id as user_id from account left join user on account.id = user.owner where account.id = ?;", [id] );
-            console.log( row );
+            // console.log( row );
             retVal = row[0];
         }catch( err ){
             console.log( err );

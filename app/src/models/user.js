@@ -85,7 +85,7 @@ class User{
     async guestLogin( guestId ){
 
         const accountInfo = await UserStorage.getAccountInfo( guestId );
-        console.log( accountInfo );
+        // console.log( accountInfo );
 
         if( accountInfo ){
             return { success : true, accountInfo : accountInfo };

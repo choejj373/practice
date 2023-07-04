@@ -3,42 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="stylesheet" href="/css/home/login.css">     -->
+    <link rel="stylesheet" href="/css/home/login.css">    
     <script src="/js/home/home.js" defer> </script>
     <title>Document</title>
 </head>
 <body>
-    <div id = "userInfo" style = "width:600px;height:25px;background-color:yellow">
-        이름<input id = "name" type="text" value="guest" style="width:50px" readonly></intput>
-        경험치<input id = "exp" type="text" value="0" style="width:50px" readonly></intput>
-        배틀코인<input id = "battlecoin" type="text" value="0" style="width:50px" readonly></intput>
-        다이아몬드<input id = "diamond" type="text" value="0" style="width:50px" readonly></intput>
-        골드<input id = "money" type="text" value="0" style="width:50px" readonly></intput> 
+    <!-- <div id = "loginView"  style = "display:none;width:600px; height:400px;background-color:#CF0"> -->
+    <div id = "loginView" class="login-page" style = "display:none">
+        <div class="form" >
+            <input id = "loginId" type="text" placeholder="아이디"/><br>
+            <input id = "loginPassword" type="password" placeholder="패스워드"/><br>
+            <input id = "loginBtn" type="button" value="login" /><br><br>
 
+            <input id = "guestLoginBtn" type="button" value="게스트 로그인"></input>
+            <input id = "moveRegisterBtn" type="button" value="계정 생성"></input><br>
+        </div>
     </div>
-
-    <div id = "loginView"  style = "display:none;width:600px; height:400px;background-color:#CF0">
-        <input id = "loginId" type="text" placeholder="아이디"/><br>
-        <input id = "loginPassword" type="password" placeholder="패스워드"/><br>
-        <input id = "loginBtn" type="button" value="login"></input><br><br>
-
-        <input id="guestLoginBtn" type="button" value="게스트 로그인"></input>
-        <input id="moveRegisterBtn" type="button" value="계정 생성"></input><br>
-
-        <!-- <p class="message">Not registered? <a href="/register">Create an account</a></p> -->
-    </div>
-    <div id = "registerView" class="register-page" style = "display:none;width:600px; height:400px;background-color:#CF0">
-        <div class="form">
-          <form class="register-form">
+    <!-- <div id = "registerView" style = "display:none;width:600px; height:400px;background-color:#CF0"> -->
+    <div id = "registerView" class="login-page" style = "display:none;">
+        <div class="form" >
             <input id = "registerId" type="text" placeholder="아이디"/><br>
             <input id = "registerName" type="text" placeholder="이름"/><br>
             <input id = "registerPsword" type="password" placeholder="패스워드"/><br>
             <input id = "registerPswordConfirm" type="password" placeholder="패스워드 확인"/><br>
+
             <input id = "registerBtn" type = "button" value="Signup"></input>
-          </form>
+            <input id = "moveLoginBtn" type= "button" value="SignIn"></input>
         </div>
-      </div>
+    </div>
     <div id = "mainView" style = "display:none;width:600px; height:400px;background-color:#CF0">
+        <div id = "userInfo" style = "width:600px;height:25px;background-color:yellow">
+            이름<input id = "name" type="text" value="guest" style="width:50px" readonly></intput>
+            경험치<input id = "exp" type="text" value="0" style="width:50px" readonly></intput>
+            배틀코인<input id = "battlecoin" type="text" value="0" style="width:50px" readonly></intput>
+            다이아몬드<input id = "diamond" type="text" value="0" style="width:50px" readonly></intput>
+            골드<input id = "money" type="text" value="0" style="width:50px" readonly></intput> 
+    
+        </div>
         <div id="mainStore" style = "display:none;">
             <div style = "width:300px; height:400px; float: left; background-color:beige">
                 <p> 일일 상점</p>
@@ -80,32 +81,16 @@
                 <input id = "normalQuestBtn" type="button" value="업적 Quest"></intput><br>
                 <ul id = "questList">
                 </ul>
-
-                <!-- <div id = "dailyQuestView" >
-                    <ul id = "dailyQuestList">
-                    </ul>
-                </div>
-                <div id = "weeklyQuestView" style = "display:none;">
-                    <ul id = "weeklyQuestList">
-                    </ul>
-                </div>
-                <div id = "normalQuestView" style = "display:none;">
-                    <ul id = "normalQuestList">
-                    </ul>
-                </div> -->
             </div>
         </div>
-
-
-
-    </div>
-    <div id = "navBottom" style = "width:600px;background-color:cyan">
-        <input id = "store" type="button" value="상점"></intput>
-        <input id = "inven" type="button" value="장비"></intput>
-        <input id = "combat" type="button" value="전투"></intput>
-        <input id = "challenge" type="button" value="도전"></intput>
-        <input id = "evolution" type = "button" value="진화"></intput>
-        <input id = "logout" type="button" value="접속종료"></intput>
+        <div id = "navBottom" style = "width:600px;background-color:cyan">
+            <input id = "store" type="button" value="상점"></intput>
+            <input id = "inven" type="button" value="장비"></intput>
+            <input id = "combat" type="button" value="전투"></intput>
+            <input id = "challenge" type="button" value="도전"></intput>
+            <input id = "evolution" type = "button" value="진화"></intput>
+            <input id = "logout" type="button" value="접속종료"></intput>
+        </div>
     </div>
 </body>
 </html>
