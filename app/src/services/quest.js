@@ -12,18 +12,19 @@ const moment = require('moment');
 // 4. 퀘스트별로 UPDATE가 필요한 부분은 이 모듈을 통해서  처리한다.( 매일 로그인, 몬스터 처치, 보스 처치 등등 )
 // 5. 보상 부여도 여기서
 
-// enum
-// fulfill type : 1 - 로그인, 2 - 다이아 사용
-// reward type : 1 - 다이아몬드, 2 - 골드, 3 - 아이템
 class Quest{
 
 // 여기서 userquestinfo를 가져온다.
 // 가져오다가 expired된 quest가 있다면 갱신해주자
     constructor(){
+        this.questMap = new Map();
         QuestStorage.loadQuestList()
         .then((result)=>{
-            this.questList = result.quests;
-            // console.log( this.questList );
+
+            result.quests.forEach( (quest) =>{
+                this.questMap.set( quest.id, quest) ;
+            } );
+            console.log( this.questMap );
         })
         .catch(console.log)
     }
@@ -33,89 +34,111 @@ class Quest{
     createUserQuestAll( userId )
     {
         console.log( "Quest.createUserQuestAll");
-        QuestStorage.createUserQuestAll( userId, this.questList );
+        QuestStorage.createUserQuestAll( userId, this.questMap );
     }
 
-    getQuestIndexByFulfill( fulfillType )
-    {
-        let result = [];
-        this.questList.forEach((quest)=>{
-            if( quest.fulfill_type == fulfillType ){
-                result.push( quest.id );
-            }
-        });
-        return result;
+    // getQuestIndexByFulfillType( fulfillType )
+    // {
+    //     let result = [];
+    //     this.questList.forEach((quest)=>{
+    //         if( quest.fulfill_type == fulfillType ){
+    //             result.push( quest.id );
+    //         }
+    //     });
+    //     return result;
+    // }
+
+    getQuestInfo( questIndex ){
+        // let result = { 
+        //     rewardType : 0,
+        //     rewardValue : 0,
+        //     rewardSubtype : 0,
+        //     fulfill_value : 0,
+        //     next_quest : 0,
+        //     type : 0,
+        // }
+
+        // this.questList.forEach((quest)=>{
+        //     if( quest.id == questIndex ){
+        //         result.rewardType = quest.reward_type;
+        //         result.rewardValue = quest.reward_value;
+        //         result.fulfill_value = quest.fulfill_value;
+        //         result.rewardSubtype = quest.reward_subtype;
+        //         result.type = quest.type;
+        //         result.next_quest = quest.next_quest;
+        //     }
+        // });
+
+        return this.questMap.get( questIndex );
     }
 
-    getRewardInfo( questIndex ){
-        let result = { 
-            rewardType : 0,
-            rewardValue : 0,
-            rewardSubtype : 0,
-            fulfill_value : 0
-        }
-
-        this.questList.forEach((quest)=>{
-            if( quest.id == questIndex ){
-                result.rewardType = quest.reward_type;
-                result.rewardValue = quest.reward_value;
-                result.fulfill_value = quest.fulfill_value;
-                result.rewardSubtype = quest.reward_subtype;
-            }
-        });
-
-        return result;
+    findQuestType( questIndex ){
+        return this.questMap.get( questIndex );
     }
-
+    // TODO 보상 지급이 완료된 후 NEXT QUEST를 넣어주고 있는데 이를 보상 지급과 함께 처리할수 있도록 해보자
+    // 보상 지급전 제한을 체크 하는 쿼리도 같이 넣어주면 더 좋을것 같다.;;
+    // 한번에 너무 많은 테이블을 건드리는건 아닌지 모르겠네;;;SP로 처리하는게 더 낫겠다;;;;
     async rewardQuestReward( userId, questId, questIndex ){
-        const result = this.getRewardInfo( questIndex );
+        const quest = this.getQuestInfo( questIndex );
+
         let response = { success:false, msg:"Error" };
 
-        if( result.rewardType == 0){
+        if( quest.reward_type == 0){
             return { success:false, msg:"Not Found Reward" }
+        }
+        
+        //완료를 위해서 스테이지 클리어 제한이 걸린 퀘스트
+        if( quest.limit_type === 1)
+        {
+            //TODO 현재 클리어한 스테이지 정보가 필요하다.
+            //어디엔가 저장후 이곳에서 비교해야 한다.
         }
 
         // DB에 userId, questId, questIndex, value >= fulfill_value , complete = 0 으로 체크하여
         // set complete = 1 && 보상 지급
-        switch( result.rewardType )
+        switch( quest.reward_type )
         {
             case 1:// 다이아몬드
-                response = QuestStorage.rewardDiamond( userId, questId, questIndex, result.fulfill_value, result.rewardValue );
+                response = await QuestStorage.rewardDiamond( userId, questId, questIndex, quest.fulfill_value, quest.reward_value );
                 break;
             case 2://골드
-                response = QuestStorage.rewardMoney( userId, questId, questIndex, result.fulfill_value, result.rewardValue );
+                response = await QuestStorage.rewardMoney( userId, questId, questIndex, quest.fulfill_value, quest.reward_value );
                 break;
             case 3://아이템
-                console.log("TODO" );
-                response = QuestStorage.rewardItem( userId, questId, questIndex, result.fulfill_value, result.rewardValue, result.rewardSubtype );
+                response = await QuestStorage.rewardItem( userId, questId, questIndex, quest.fulfill_value, quest.reward_value, quest.reward_subtype );
                 break;
             default:
-                console.log("Invalid reward Type : ", result.rewardType );
+                console.log("Invalid reward Type : ", quest.reward_type );
                 break;
+        }
+
+        const nextQuestType = this.findQuestType( quest.next_quest );
+
+        console.log( `userId:${userId}, questId:${questId}, nextQuestIndex:${quest.next_quest}, nextQuestType:${nextQuestType}` );
+        console.log( response.success );
+        //보상 지급 완료 && 노말 타입 퀘스트 && next_quest가 설정 되어 있는 경우에만 연계 퀘스트를 자동으로 생성해 준다.
+        if( response.success && quest.type === 0 && quest.next_quest > 0 )
+        {
+            //기존 퀘스트 삭제 && 다음 퀘스트 추가
+            response = QuestStorage.questDeleteNCreate( userId, questId, quest.next_quest, nextQuestType );
         }
         return response;
     }
 
+    // 스테이지 클리어시 퀘스트 값 변경
+    processStageClear( userId, stageId ){
+        QuestStorage.setUserQuestValue( userId, 3, stageId );
+    }
     // 다이아 소모시 퀘스트 값 변경
     processUseDiamond( userId, value )
     {
-        const questIndexList = this.getQuestIndexByFulfill( 2 );
-        // console.log( questIndexList );
-        questIndexList.forEach( (questIndex)=>{
-            // console.log( questIndex );
-            QuestStorage.addUserQuestValue( userId, questIndex, value );
-        });
+        QuestStorage.addUserQuestValue( userId, 2, value );
     }
     
     //로그인시 퀘스트 값 변경
     processLogin( userId ){
+        QuestStorage.addUserQuestValue( userId, 1, 1 );
 
-        const questIndexList = this.getQuestIndexByFulfill( 1 );
-        // console.log( questIndexList );
-        questIndexList.forEach( (questIndex)=>{
-            // console.log( questIndex );
-            QuestStorage.addUserQuestValue( userId, questIndex, 1 );
-        });
     }
     
 

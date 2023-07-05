@@ -20,12 +20,24 @@ quest_list
 id : pk int
 type    // 일일/주간/업적 not null int
 reward_type default 0 
-reward_Value default 0 
+reward_Value default 0
+reward_subtype default 0 - 보상이 아이템일 경우 item_index를 설정한다.
 
 fulfill_type default 0  
 fulfill_value default 0 
+
+next_quest int default 0        : 자동 연계 퀘스트로 다음 자동 생성될 퀘스트 ID( 일일/주간 퀘스트에 적용하면 안됨;;)
+init_quest tinyint default 0    : 캐릭터 생성시 자동으로 생성될 퀘스트
+
+limit_type  : 완료 제한 타입( 모바일의 경우 퀘스트는 자동으로 시작되는 경우가 대부분이다.)
+limit_value : 제한 값
 */
 
+// enum
+// quest type   : 0 - 일반,       1 - 일일,       2 - 주간
+// fulfill type : 1 - 로그인,     2 - 다이아 사용  3 - 스테이지 클리어
+// reward type  : 1 - 다이아몬드, 2 - 골드,        3 - 아이템
+// limit_type   : 1 - 스테이지 클리어
 
 
 class QuestStorage
@@ -38,7 +50,6 @@ class QuestStorage
 
         try{
             const [row] = await conn.query("SELECT * FROM quest_list;" );
-
             retVal.success = true;
             retVal.quests = row;
         }catch(err)
@@ -50,6 +61,46 @@ class QuestStorage
         return retVal;
     }
 
+    async questDeleteNCreate( userId, deleteQuestId, createQuestIndex, createQuestType )
+    {
+        const conn = await dbPool.getConnection();
+        let retVal = { success:false };
+        try{
+            const sql1 = "DELETE FROM user_quest WHERE id = ? AND owner = ?;"
+            const sql1a = [ deleteQuestId, userId ]
+            const sql1s = mysql.format( sql1, sql1a );
+            console.log( sql1s );
+
+            const sql2 = "INSERT INTO user_quest ( quest_index, quest_type, owner ) values ( ?, ?, ? );";
+            const sql2a = [ createQuestIndex, createQuestType, userId]
+            const sql2s = mysql.format( sql2, sql2a);
+
+            console.log( sql2s );
+
+            await conn.beginTransaction();
+
+            const result = await conn.query( sql1s + sql2s );
+
+            if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0 ) {
+                console.log( "commit");
+                await conn.commit();
+                retVal = {success:true};
+            }else{
+                console.log( "rollback : ", "db query failed");                            
+                await conn.rollback();
+                retVal = {success:false, msg:"db query failed"};
+            }
+
+        } catch( err ){
+            console.log( "rollback : ", err );
+            retVal = {success:false, msg:"db query error"};
+            await conn.rollback();
+        } finally{
+            console.log( "finally");
+            conn.release();
+        }
+        return retVal;         
+    }
     // rewardValue : 아이템의 갯수, 소모 아이템등의 갯수가 존재하는 아이템의 경우 사용 defalut = 1
     async rewardItem( userId, questId, questIndex, fulfillValue, rewardValue, rewardSubtype )
     {
@@ -149,9 +200,9 @@ class QuestStorage
 
             await conn.beginTransaction();
 
-            const result = await conn.query( sql1s + sql2s );
+            const result = await conn.query( sql1s + sql2s);
 
-            if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0 ) {
+            if( result[0][0].affectedRows > 0 && result[0][1].affectedRows > 0  ) {                
                 console.log( "commit");
                 await conn.commit();
                 retVal = {success:true};
@@ -170,14 +221,33 @@ class QuestStorage
         }
         return retVal;
     }
+    async setUserQuestValue( userId, fulfillType, fulfillValue ){
+        const conn = await dbPool.getConnection();
 
-    async addUserQuestValue( userId, questIndex, addValue ){
+        try{
+            // await conn.query("UPDATE user_quest SET value = value + ? WHERE owner = ? AND quest_index=?;", 
+            //         [addValue, userId, questIndex] );
+
+            await conn.query("UPDATE user_quest SET value = ? WHERE owner = ? AND quest_index IN ( select quest_list.id from quest_list where quest_list.fulfill_type = ?  AND quest_list.fulfill_value = ?);", 
+                    [ fulfillValue, userId, fulfillType, fulfillValue] );
+
+        }catch(err)
+        {
+            console.log(err);
+        }finally{
+            conn.release();
+        }
+    }
+    async addUserQuestValue( userId, fulfillType, addValue ){
 
         const conn = await dbPool.getConnection();
 
         try{
-            await conn.query("UPDATE user_quest SET value = value + ? WHERE owner = ? AND quest_index=?;", 
-                    [addValue, userId, questIndex] );
+            // await conn.query("UPDATE user_quest SET value = value + ? WHERE owner = ? AND quest_index=?;", 
+            //         [addValue, userId, questIndex] );
+
+            await conn.query("UPDATE user_quest SET value = value + ? WHERE owner = ? AND quest_index IN ( select quest_list.id from quest_list where quest_list.fulfill_type = ? );", 
+                    [addValue, userId, fulfillType] );
 
         }catch(err)
         {
@@ -292,6 +362,10 @@ class QuestStorage
 
             // TODO 소스 정리좀;
             questList.forEach( (element)=>{
+                
+                if( element.init_quest === 0 )
+                    return;
+
                 switch( element.type ){
                     case 1://일일 퀘스트
                         conn.query("INSERT INTO user_quest ( quest_index, quest_type, expire_date, owner ) values ( ?, ?, ?, ? )" ,

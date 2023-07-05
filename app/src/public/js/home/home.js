@@ -37,13 +37,6 @@ const questBtn = document.getElementById('quest');
 const questView = document.getElementById('questView');
 const combatView = document.getElementById('combatView');
 
-// const dailyQuestView = document.getElementById('dailyQuestView');
-// const weeklyQuestView = document.getElementById('weeklyQuestView');
-// const normalQuestView = document.getElementById('normalQuestView');
-
-// const dailyQuestList = document.getElementById('dailyQuestList');
-// const weeklyQuestList = document.getElementById('weeklyQuestList');
-// const normalQuestList = document.getElementById('normalQuestList');
 
 const questList = document.getElementById('questList');
 
@@ -246,7 +239,6 @@ function promptInputItemId(){
         if( res.success ){
             showInven();
         } else {
-            alert( res.msg );
             processResponseFail( res.msg )
         }
     })
@@ -269,7 +261,6 @@ function onClickedEquip( element ){
         if( res.success ){
             showInven();
         } else {
-            alert( res.msg );
             processResponseFail( res.msg )
         }
     })
@@ -493,6 +484,19 @@ function showStore(){
     // 무료 다이아를 얻지 않았다면 무료 구매 활성화 아니라면 비활성화
 }
 
+// User관련 Date를 가지고 있던 element들 초기화
+function clearUserData()
+{
+    const inven = document.getElementById('inventory');
+    const equip = document.getElementById('equip');
+
+    inven.replaceChildren();
+    equip.replaceChildren();
+
+
+    questList.replaceChildren();
+}
+
 const logoutBtn = document.getElementById("logout");
 logoutBtn.addEventListener("click", logout );
 
@@ -509,6 +513,7 @@ function logout(){
     .then((res) => {
         console.log( res );
         if( res.success ){
+            clearUserData();
             showLoginView();
         } else {
             alert( res.msg );
@@ -558,6 +563,7 @@ function getUserInfo()
              battlecoinTxt.value = res.battleCoin;
              diamondTxt.value = res.diamond;
              moneyTxt.value = res.userMoney;
+
          } else {
             processResponseFail( res.msg )
          }
