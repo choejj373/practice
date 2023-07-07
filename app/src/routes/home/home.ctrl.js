@@ -53,6 +53,9 @@ const output = {
 }
 
 const process = {
+    checkToken :( req,res )=>{
+        return res.json( { success:true } );
+    }, 
     requireQuestReward : async ( req, res)=>{
         console.log( 'process.requireQuestReward : ', req.userId );
         const response = await Quest.rewardQuestReward( req.userId, req.body.questId, req.body.questIndex );

@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/home/login.css">    
-    <script src="/js/home/home.js" defer> </script>
+
+    <script type="module" src="/js/home/home.js" defer> </script>
+    <script type="module" src="/js/home/Party.js" defer> </script>
+    <script type="module" src="/js/home/Object.js" defer> </script>    
+    <script type="module" src="/js/home/Skill.js" defer> </script>    
+    <script type="module" src="/js/home/game.js" defer> </script>    
+    <script type="module" src="/js/home/command.js" defer> </script>    
     <title>Document</title>
 </head>
 <body>
@@ -70,10 +76,14 @@
         </div>
         <div id="mainCombat">
             <div style = "width:100px; height:400px; float: left; background-color:beige">
-                <a href="/singlegame">Single Game</a><br>
+                <input id = "singlegameBtn" type="button" value="싱글 게임"></intput><br>
                 <input id = "quest" type="button" value="Quest"></intput><br>
             </div>
             <div id = "combatView" style = "width:500px; height:400px; float: left; background-color:bisque">
+                <input id = "startGameBtn" type="button" value="게임 시작"></intput>
+                <input id = "endGameBtn" type="button" value="게임 종료" disabled ></intput><br>
+                <ul id = "singlegameLog" style="width:450px; height:350px; overflow:auto">
+                </ul>
             </div>
             <div id = "questView" style = "display:none;width:500px; height:400px; float: left; background-color:bisque">
                 <input id = "dailyQuestBtn" type="button" value="일일 Quest"></intput>

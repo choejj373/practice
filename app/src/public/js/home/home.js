@@ -33,6 +33,7 @@ const buyShoesBtn = document.getElementById("buyShoes");
 const invenList = document.getElementById('inventory');
 const sellItemBtn = document.getElementById('sellItemBtn');
 
+const singlegameBtn =document.getElementById('singlegameBtn'); 
 const questBtn = document.getElementById('quest');
 const questView = document.getElementById('questView');
 const combatView = document.getElementById('combatView');
@@ -43,6 +44,14 @@ const questList = document.getElementById('questList');
 const dailyQuestBtn = document.getElementById('dailyQuestBtn');
 const weeklyQuestBtn = document.getElementById('weeklyQuestBtn');
 const normalQuestBtn = document.getElementById('normalQuestBtn');
+
+const startGameBtn = document.getElementById('startGameBtn');
+const endGameBtn = document.getElementById('endGameBtn');
+
+
+singlegameBtn.addEventListener("click", showSinglegameView );
+startGameBtn.addEventListener("click", startGame );
+endGameBtn.addEventListener("click", endGame );
 
 moveRegisterBtn.addEventListener("click", showResisterView );
 moveLoginBtn.addEventListener("click", showLoginView );
@@ -127,6 +136,13 @@ function registerAccount(){
 
 
     })
+}
+
+function showSinglegameView(){
+    console.log('showQuestView');
+    clearCombatRightView();
+
+    combatView.style.display = '';
 }
 
 function showQuestView(){
@@ -651,14 +667,78 @@ function loginGuestAccount(){
     })
 }
 
+function checkToken(){
+    console.log("checkToken");
+
+    fetch("/", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify( )
+    })
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        //console.log( res);
+        if( res.success ){
+            showMainView();
+            getUserInfo();
+        } else {
+            processResponseFail( res.msg )
+        }
+    })
+}
 const usernameTxt = document.getElementById("name");
 const expTxt = document.getElementById("exp");
 const battlecoinTxt = document.getElementById("battlecoin");
 const diamondTxt = document.getElementById("diamond");
 const moneyTxt = document.getElementById("money");
 
+// import Party from  "./Party.mjs";
+// const p = new Party;
+
+
 window.onload = function(){
     console.log( "window onload" );
-    showMainView();
-    getUserInfo();
+    // showLoginView();
+    checkToken();
 };
+
+let g_gameId = 0;
+import { MakeNewGame, updateFrame } from './game.js'
+
+function endGame(){
+    let messageItem = document.createElement('li');
+    messageItem.textContent = "Game End";
+    singlegameList.appendChild(messageItem);
+
+    singlegameList.scrollTo( 0 , singlegameList.scrollHeight );
+
+    endGameBtn.disabled = true; 
+    startGameBtn.disabled = false; 
+    clearInterval( g_gameId );
+}
+
+const singlegameList = document.getElementById("singlegameLog");
+function updateGameFrame(){
+    // console.log("Game Update Frame")
+    if(!updateFrame(singlegameList)){
+        endGame();
+    }
+}
+
+function startGame()
+{
+    singlegameList.replaceChildren();
+
+    let messageItem = document.createElement('li');
+    messageItem.textContent = "Game Start";
+    singlegameList.appendChild(messageItem);
+
+
+
+    endGameBtn.disabled = false; 
+    startGameBtn.disabled = true;
+    MakeNewGame();
+    g_gameId = setInterval( updateGameFrame, 33 );
+}

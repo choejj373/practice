@@ -20,17 +20,21 @@ const authUtil = require('../../middlewares/auth')
 // router.post("/inventory/sell-item", authUtil.checkToken,ctrl.process.inventory_sell_item );
 
 //// 삭제 예정
-router.post("/singlegame", authUtil.checkToken,ctrl.process.startsinglegame);
-router.delete("/singlegame", authUtil.checkToken,ctrl.process.endsinglegame );
+// router.post("/singlegame", authUtil.checkToken,ctrl.process.startsinglegame);
+// router.delete("/singlegame", authUtil.checkToken,ctrl.process.endsinglegame );
 ////
 
 router.get("/", ctrl.output.home);
+
+//처음 시작시나 브라우저 리로드시 토큰으로 인증 체크
+router.put("/", authUtil.checkToken, ctrl.process.checkToken );
 
 router.post("/user/guest", ctrl.process.guestRegister );
 router.put("/user/guest", ctrl.process.guestLogin );
 
 router.post("/user", ctrl.process.register );
 router.put("/user", ctrl.process.login );
+
 router.get("/user", authUtil.checkToken,ctrl.process.getuserinfo);
 router.delete("/user", authUtil.checkToken,ctrl.process.logout);
 
