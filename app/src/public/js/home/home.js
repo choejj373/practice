@@ -50,6 +50,10 @@ const normalQuestBtn = document.getElementById('normalQuestBtn');
 const startGameBtn = document.getElementById('startGameBtn');
 const endGameBtn = document.getElementById('endGameBtn');
 
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+
+
+googleLoginBtn.addEventListener("click", googleLogin );
 
 singlegameBtn.addEventListener("click", showSinglegameView );
 startGameBtn.addEventListener("click", startGame );
@@ -667,6 +671,26 @@ function getGuestAccount()
           alert( res.msg );
         }
     })
+}
+
+function googleLogin(){
+
+
+    window.open("http://localhost:3000/auth/google",  "_self")    
+    // fetch("/auth/google",{
+    //     method: "POST",
+    //     body: JSON.stringify({
+    //         userId: 1,
+    //     })})
+    // .then( (res) => res.json()) // json() promise
+    // .then( (res) => {
+    //     //console.log( res);
+    //     if( res.success ){
+    //         console.log("google login success");
+    //     } else {
+    //       alert( res.msg );
+    //     }
+    // })
 }
 
 function loginGuestAccount(){

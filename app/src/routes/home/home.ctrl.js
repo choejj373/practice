@@ -1,14 +1,65 @@
 "use strict";
-const jwt = require('../../modules/jwt');
+const passport = require('passport');
+const crypto = require("crypto");
 
+const jwt = require('../../modules/jwt');
 const User = require("../../models/user");
 const UserStorage = require("../../models/userstorage");
 const UserStorageCache = require("../../models/userstoragecache");
 const Quest = require("../../services/quest");
-
-const crypto = require("crypto");
-
 const Secret = require("../../services/secret")
+
+
+const { default: axios } = require('axios');
+const url = require('url');
+
+
+
+const CLIENT_ID = "145681489601-h711k94pqvn4d5i1kod2u8aqa5fauo4s.apps.googleusercontent.com";
+const CLIENT_SECRET = "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"
+const AUTHORIZE_URI = "https://accounts.google.com/o/oauth2/v2/auth";
+const REDIRECT_URL = "http://localhost:3000/auth/google/callback";
+const RESPONSE_TYPE = "code";
+const SCOPE = "openid%20profile%20email";
+const ACCESS_TYPE = "offline";
+const OAUTH_URL = `${AUTHORIZE_URI}?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}&redirect_uri=${REDIRECT_URL}&scope=${SCOPE}&access_type=${ACCESS_TYPE}`;
+
+const getToken = async ( code ) => {
+    try{
+        const tokenApi = await axios.post(
+            `https://oauth2.googleapis.com/token?code=${code}&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&redirect_uri=${REDIRECT_URL}&grant_type=authorization_code`
+        );
+
+        const accessToken = tokenApi.data.access_token;
+
+        return accessToken;
+    }catch(err){
+        return err;
+    }
+};
+
+const getUserInfo = async ( accessToken) =>{
+    try{
+        const userInfoApi = await axios.get(
+            `https://www.googleapis.com/oauth2/v2/userinfo?alt=json`,
+            {
+                headers:{
+                    authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        return userInfoApi;
+    }catch( err ){
+        return err;
+    }
+}
+
+const oauth2Api = async(code)=>{
+    const accessToken = await getToken(code);
+    const userInfo = await getUserInfo(accessToken) ;
+    return userInfo.data;
+}
+
 
 const output = {
     test : ( req,res )=>{
@@ -332,7 +383,25 @@ const process = {
             })
         }
         return res.json( response );
+    },
+    googleLogin : async ( req, res )=>{
+        console.log("googleLogin")
+        res.redirect(OAUTH_URL);
+    },
+    googleRedirect : async ( req, res )=>{
+        console.log("googleRedirect")
+
+        const query = url.parse( req.url, true ).query;
+        if( query && query.code ){
+            const userInfo = oauth2Api( query.code);
+            //1. userInfo로 DB에 user를 찾아보고 없다면 새로 생성
+            //2. token을 새로 만들어서 클라이언트에게 알려줌..
+            //3. res.redirect에 token을 넣어서 보내준다.
+        }
+
+        res.redirect("/");
     }
+
 }
 
 module.exports = {

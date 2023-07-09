@@ -56,4 +56,8 @@ router.get("/quest/daily", authUtil.checkToken,ctrl.process.getUserDailyQuestInf
 router.get("/quest/weekly", authUtil.checkToken,ctrl.process.getUserWeeklyQuestInfo );
 router.get("/quest/normal", authUtil.checkToken,ctrl.process.getUserNormalQuestInfo );
 router.put("/quest/reward", authUtil.checkToken,ctrl.process.requireQuestReward );
+
+router.get('/auth/google', ctrl.process.googleLogin );
+router.get('/auth/google/callback', ctrl.process.googleRedirect );
+ 
 module.exports = router;   

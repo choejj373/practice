@@ -12,7 +12,8 @@
     + node js addon c++( ~ing )
 
     + 계정 등록 및 로그인 
-        + 게스트 로그인
+        + Guest Login
+        + Google Login
         + 패스워드 암호화
         + 로그인시 비대칭 암호화 적용
 
@@ -90,6 +91,8 @@
 
 
 + 작업중
+    + Google Login된 유저의 계정 생성 및 로그인 처리(토큰 생성등) 추가
+
     + node js addon c++ : 전투 결과 검증을 좀 더 빠르게 하기 위해
         + 간단한 전투 시뮬을 10만번 loop 돌릴시 생각 보다 많은 차이가 났다.
             + javascript : 100~150ms
