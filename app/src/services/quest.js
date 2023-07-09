@@ -24,7 +24,7 @@ class Quest{
             result.quests.forEach( (quest) =>{
                 this.questMap.set( quest.id, quest) ;
             } );
-            console.log( this.questMap );
+            // console.log( this.questMap );
         })
         .catch(console.log)
     }

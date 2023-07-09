@@ -1,6 +1,8 @@
 //서버에서 발급받은 게스트 계정 저장
 let guestId = undefined;
 
+
+
 const loginView = document.getElementById("loginView");
 const registerView = document.getElementById("registerView");
 const mainView = document.getElementById("mainView");
@@ -516,6 +518,8 @@ function clearUserData()
 const logoutBtn = document.getElementById("logout");
 logoutBtn.addEventListener("click", logout );
 
+
+
 function logout(){
     console.log( "clicked" );
     fetch("/user", {
@@ -592,11 +596,32 @@ const loginBtn = document.getElementById("loginBtn");
 
 loginBtn.addEventListener("click", login );
 
+let g_publicKey = null;
+
+// import JSEncrypt from "./JSEncrypt.min.js";
+
+function getValueEncodedByPublicKey( text)
+{
+
+    var crypt = new JSEncrypt();
+
+    // // 키 설정
+    crypt.setPublicKey(g_publicKey);
+
+    // // 암호화
+    var encryptedText = crypt.encrypt(text);    
+
+    return encryptedText;
+}
+
 function login() {
 
+    const id = getValueEncodedByPublicKey(loginId.value);
+    const pwd = getValueEncodedByPublicKey(loginPassword.value);
+    
     const req = {
-        id: loginId.value,
-        psword: loginPassword.value,
+        id: `${id}`,
+        psword: `${pwd}`,
     };
 
     console.log( req );
@@ -698,14 +723,29 @@ const moneyTxt = document.getElementById("money");
 // const p = new Party;
 
 
+
+function getPublicKey()
+{
+    fetch("/crypto/publickey")
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        console.log( res);
+        if( res.success ){
+            g_publicKey = res.publicKey;
+            checkToken();
+        } else {
+          alert( res.msg );
+        }
+    })
+}
 window.onload = function(){
     console.log( "window onload" );
     // showLoginView();
-    checkToken();
+    getPublicKey();
 };
 
 let g_gameId = 0;
-import { MakeNewGame, updateFrame } from './game.js'
+import { MakeNewGame, updateFrame, clearGame } from './game.js'
 
 function endGame(){
     let messageItem = document.createElement('li');
@@ -717,11 +757,12 @@ function endGame(){
     endGameBtn.disabled = true; 
     startGameBtn.disabled = false; 
     clearInterval( g_gameId );
+    clearGame();
 }
 
 const singlegameList = document.getElementById("singlegameLog");
 function updateGameFrame(){
-    // console.log("Game Update Frame")
+
     if(!updateFrame(singlegameList)){
         endGame();
     }
@@ -735,10 +776,10 @@ function startGame()
     messageItem.textContent = "Game Start";
     singlegameList.appendChild(messageItem);
 
-
-
     endGameBtn.disabled = false; 
     startGameBtn.disabled = true;
+
     MakeNewGame();
-    g_gameId = setInterval( updateGameFrame, 33 );
+
+    g_gameId = setInterval( updateGameFrame, 30 );
 }

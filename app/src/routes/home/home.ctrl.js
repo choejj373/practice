@@ -1,11 +1,14 @@
 "use strict";
 const jwt = require('../../modules/jwt');
 
-//const UserStorage = require("../../models/userstorage");
 const User = require("../../models/user");
 const UserStorage = require("../../models/userstorage");
 const UserStorageCache = require("../../models/userstoragecache");
 const Quest = require("../../services/quest");
+
+const crypto = require("crypto");
+
+const Secret = require("../../services/secret")
 
 const output = {
     test : ( req,res )=>{
@@ -53,6 +56,16 @@ const output = {
 }
 
 const process = {
+
+    //대칭키는 항상 개인키로 암호화 하여 보낸다.
+    getSymmetricKey : ( req, res ) => {
+        const key = Secret.getSymmetricKeyEncodedByPrivateKey();
+        return res.json( { success:true, symmeticKey: `${key}` } );
+    },
+    getPublicKey : ( req, res ) => {
+        const publicKey = Secret.getPublicKey();
+        return res.json( { success:true, publicKey: `${publicKey}` } );
+    },
     checkToken :( req,res )=>{
         return res.json( { success:true } );
     }, 
@@ -163,6 +176,10 @@ const process = {
     },
     login: async(req, res) => { 
         console.log( "process.login" );
+        
+
+        req.body.id = Secret.getValueDecodedByPrivateKey( req.body.id );
+        req.body.psword = Secret.getValueDecodedByPrivateKey( req.body.psword );
 
         const user = new User( req.body );
         const response = await user.login();

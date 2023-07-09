@@ -2,13 +2,15 @@
 
 const express = require("express");
 const dotenv = require ("dotenv");
-
+const crypto = require ("crypto");
 const cookieParser = require('cookie-parser');
 const expressSession = require("express-session");
 
 
 dotenv.config();
 
+
+// console.log( SymmetricKey );
 /**====================================================*/
 // For Log System
 /* const logger = require("./src/config/logger")
@@ -143,4 +145,5 @@ app.use('/', home);
 
  
 module.exports = app;
+
 // module.exports.sessionMiddleware = sessionMiddleware;

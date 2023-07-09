@@ -28,6 +28,8 @@ router.get("/", ctrl.output.home);
 
 //처음 시작시나 브라우저 리로드시 토큰으로 인증 체크
 router.put("/", authUtil.checkToken, ctrl.process.checkToken );
+router.get("/crypto/publickey", ctrl.process.getPublicKey );
+//router.get("/crypto/symmetrickey", ctrl.process.getSimmetricKey );
 
 router.post("/user/guest", ctrl.process.guestRegister );
 router.put("/user/guest", ctrl.process.guestLogin );

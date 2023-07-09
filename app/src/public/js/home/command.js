@@ -11,9 +11,13 @@ export class cmdDamage extends command{
         this.damage = damage;
         this.target = target;//party
     }
-    exec(){
-        this.target.damaged( this.damage );
-        return ( this.attacker + " is attack to " + this.target.getName() );
+    exec(logger){
+
+        if( this.attacker.isDead())
+        {
+            return this.attacker.getName() + "is Dead"
+        }
+        let targetName = this.target.damaged( this.damage, logger, this.attacker.getName() );
     }
 }
 
@@ -25,9 +29,13 @@ export class cmdHeal extends command{
         this.hp = hp;
         this.target = target;//object
     }
-    exec(){
-        this.target.heal( this.hp );
-        return ( this.healer + " is heal to " + this.target.getName() );
+    exec(logger){
+        if( this.healer.isDead())
+        {
+            return this.healer.getName() + " is Dead";
+        }
+
+        let targetName = this.target.heal( this.hp, logger, this.healer.getName() );
     }
 }
 
@@ -39,10 +47,13 @@ export class cmdDamageWide extends command{
         this.damage = damage;
         this.target = target;// Party
     }
-    exec(){
+    exec(logger){
+        if( this.attacker.isDead())
+        {
+            return this.attacker.getName() + " is Dead";
+        }
 
-        this.target.damagedAll( this.damage );
-        return ( this.attacker + " is AttackWide to " + this.target.getName() );
+        let targetName = this.target.damagedAll( this.damage, logger, this.attacker.getName() );
     }
 }
 
@@ -54,8 +65,13 @@ export class cmdHealWide extends command{
         this.hp = hp;
         this.target = target; // Party
     }
-    exec(){
-        this.target.healAll( this.hp );
-        return ( this.healer + " is HealWide to " + this.target.getName() );
+    exec(logger){
+
+        if( this.healer.isDead())
+        {
+            return this.healer.getName() + " is Dead";
+        }
+
+        let targetName = this.target.healAll( this.hp, logger, this.healer.getName() );
     }
 }

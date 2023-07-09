@@ -1,7 +1,7 @@
 
 "use strict";
 
-const app = require("../app");
+const app  = require("../app");
 // const sessionMiddleware = require("../app").sessionMiddleware;
 
 const PORT = process.env.PORT || 3000;

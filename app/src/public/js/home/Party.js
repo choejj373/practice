@@ -15,35 +15,45 @@ export default class Party
 
     updateFrame( nowTime, cmdQ, enemy ){
         this.memberList.forEach( (member)=>{
-            member.updateFrame( nowTime, cmdQ, enemy );
+            member.updateFrame( nowTime, cmdQ, enemy, this );
         })
     }
     
-    damagedAll( _damage ){
+    damagedAll( _damage, logger, from ){
         this.memberList.forEach( (member)=>{
-            member.damaged( _damage );
+            member.damaged( _damage, logger, from );
         })
+        return this.getName();
     }
-    damaged( damage ){
+    damaged( damage, logger, from ){
         for( let i = 0; i < this.memberList.length; i++ )
         {
-            if( this.memberList[i].damaged(damage) ){
-                return true;
+            if( this.memberList[i].damaged(damage, logger, from) ){
+                return this.memberList[i].getName();
             }
         }
-        return false;
+        return "";
     }
 
-    heal( hp )
+    heal( hp, logger, from )
     {
         for( let i = 0; i < this.memberList.length; i++ )
         {
-            if( this.memberList[i].heal(hp) ){
-                return true;
+            if( this.memberList[i].heal(hp, logger, from) ){
+                return this.memberList[i].getName();
             }
         }
-        return false;
+        return "";
     }
+
+    healAll( _hp, logger, from )
+    {
+        this.memberList.forEach((member)=>{
+            member.heal( _hp, logger, from );
+        })       
+        return this.getName() ;
+    }
+
     isDead(){
         for( let i = 0; i < this.memberList.length; i++ )
         {
@@ -65,12 +75,6 @@ export default class Party
         return hp;
     }
 
-    healAll( _hp )
-    {
-        this.memberList.forEach((member)=>{
-            member.heal( _hp );
-        })        
-    }
 }
 
 // module.exports = Party;
