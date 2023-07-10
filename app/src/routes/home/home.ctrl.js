@@ -386,20 +386,69 @@ const process = {
     },
     googleLogin : async ( req, res )=>{
         console.log("googleLogin")
-        res.redirect(OAUTH_URL);
+        // res.redirect(OAUTH_URL);
+        return res.json({ success:true, url: OAUTH_URL });
     },
     googleRedirect : async ( req, res )=>{
         console.log("googleRedirect")
 
         const query = url.parse( req.url, true ).query;
         if( query && query.code ){
-            const userInfo = oauth2Api( query.code);
+            const userInfo = await oauth2Api( query.code);
+            console.log( userInfo );
+
+            if( userInfo == undefined ){
+                return;
+            }
+
+            let accountInfo = await UserStorage.getAccountInfo( userInfo.id );
+
             //1. userInfo로 DB에 user를 찾아보고 없다면 새로 생성
+            console.log( accountInfo );
+            if( accountInfo )
+            {
+                console.log("login account by google id ")
+            }
+            else
+            {
+                console.log("create new account by google id ")
+                const password = "";
+                const salt = "";
+        
+                const result = await UserStorage.save( userInfo, password, salt );
+
+                console.log( result );
+
+                if( result.success ){
+                    Quest.createUserQuestAll( result.userId );
+
+                    accountInfo = await UserStorage.getAccountInfo( userInfo.id );
+                }
+            }
             //2. token을 새로 만들어서 클라이언트에게 알려줌..
-            //3. res.redirect에 token을 넣어서 보내준다.
+            if( accountInfo )
+            {
+                console.log( accountInfo );
+                const jwtToken = await jwt.sign( accountInfo );
+                
+                const cookieOption = {
+                    httpOnly: true,
+                    maxAge : 1000 * 60 * 60,
+                    secure : false,
+                    // 1 more
+                }
+    
+                //? 이게 되네;?
+                res.cookie( 'token', jwtToken.token, cookieOption );
+
+                Quest.processLogin( accountInfo.user_id );
+    
+                //3. res.redirect에 token을 넣어서 보내준다.
+                res.redirect("/");
+            }
         }
 
-        res.redirect("/");
+
     }
 
 }

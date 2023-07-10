@@ -676,21 +676,18 @@ function getGuestAccount()
 function googleLogin(){
 
 
-    window.open("http://localhost:3000/auth/google",  "_self")    
-    // fetch("/auth/google",{
-    //     method: "POST",
-    //     body: JSON.stringify({
-    //         userId: 1,
-    //     })})
-    // .then( (res) => res.json()) // json() promise
-    // .then( (res) => {
-    //     //console.log( res);
-    //     if( res.success ){
-    //         console.log("google login success");
-    //     } else {
-    //       alert( res.msg );
-    //     }
-    // })
+    //window.open("http://localhost:3000/auth/google",  "_self")    
+    fetch("/auth/google")
+    .then( (res) => res.json()) // json() promise
+    .then( (res) => {
+        //console.log( res);
+        if( res.success ){
+            console.log("google login success");
+            window.open( res.url );
+        } else {
+          alert( res.msg );
+        }
+    })
 }
 
 function loginGuestAccount(){

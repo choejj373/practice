@@ -87,7 +87,7 @@ class User{
         const accountInfo = await UserStorage.getAccountInfo( guestId );
         // console.log( accountInfo );
 
-        if( accountInfo ){
+        if( accountInfo){
             return { success : true, accountInfo : accountInfo };
         }
 
@@ -100,7 +100,7 @@ class User{
         const accountInfo = await UserStorage.getAccountInfo( this.accountId );
         console.log( accountInfo );
 
-        if( accountInfo ){
+        if( accountInfo) {
             const hashedPwd = await makePasswordHashed( accountInfo.salt, body.psword );
             if( accountInfo.id === this.body.id && accountInfo.psword === hashedPwd){
 

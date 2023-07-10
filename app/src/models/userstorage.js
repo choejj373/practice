@@ -129,11 +129,11 @@ class UserStorage{
         // await UserStorage.updateBattleCoin( id );
 
         const conn = await dbPool.getConnection();
-        let retVal;
+        let retVal = null;
 
         try{
-            const [row] = await conn.query("select account.*, user.id as user_id from account left join user on account.id = user.owner where account.id = ?;", [id] );
-            // console.log( row );
+            const [row] = await conn.query("select * from account where account.id = ?;", [id] );
+            console.log( row );
             retVal = row[0];
         }catch( err ){
             console.log( err );
@@ -170,16 +170,14 @@ class UserStorage{
         try{
 
 
-            const sql1 = "INSERT INTO account(id, name, psword, salt) VALUES(?, ?, ?, ?);";
-            const sql1a = [accountInfo.id,accountInfo.name,hashedpassword, salt];
-            const sql1s = mysql.format( sql1, sql1a );
-            console.log( sql1s );
+            const sql1 = "INSERT INTO user( name ) VALUES (?);";
+            const sql1a = [ accountInfo.name ];
+            const sql1s = mysql.format( sql1, sql1a);
+            console.log( sql1 );
 
-            //over flow check
-            const sql2a = [ accountInfo.name, accountInfo.id ];
-            const sql2 = "INSERT INTO user( name, owner ) VALUES (?,?);";
-            const sql2s = mysql.format( sql2, sql2a);
-
+            const sql2 = "INSERT INTO account(id, name, psword, salt, user_id) VALUES(?, ?, ?, ?, LAST_INSERT_ID());";
+            const sql2a = [accountInfo.id,accountInfo.name,hashedpassword, salt];
+            const sql2s = mysql.format( sql2, sql2a );
             console.log( sql2s );
 
             await conn.beginTransaction();
@@ -197,10 +195,10 @@ class UserStorage{
          
             await conn.commit();
             retVal = {success:true};
-            const [row] = await conn.query("SELECT id FROM user WHERE owner = ?;", [accountInfo.id] );
+            const [row] = await conn.query("SELECT user_id FROM account WHERE id = ?;", [accountInfo.id] );
 
             if( row.length > 0 ){
-                retVal.userId = row[0].id;
+                retVal.userId = row[0].user_id;
             }
 
         }catch( err ){
@@ -208,7 +206,7 @@ class UserStorage{
             await conn.rollback();
             retVal = {success:false};
         }finally{
-            conn.release();
+            await conn.release();
         }
 
         return retVal;
