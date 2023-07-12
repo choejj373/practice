@@ -91,7 +91,8 @@
 
 + 작업중
     + typescript로 컨버팅중
-
+        + https://github.com/choejj373/ts-practice
+        
     + 싱글 플레이 게임(방치형)
         + 자동 전투
         + 전투 후 서버에서 검증
