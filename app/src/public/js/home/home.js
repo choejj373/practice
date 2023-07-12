@@ -683,7 +683,7 @@ function googleLogin(){
         //console.log( res);
         if( res.success ){
             console.log("google login success");
-            window.open( res.url );
+            window.open( res.url, "_self" );
         } else {
           alert( res.msg );
         }
